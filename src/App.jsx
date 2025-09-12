@@ -4,11 +4,12 @@ import Homepage from "./pages/Homepage";
 import Navbar from "./components/layout/Navbar";
 const App = () => {
   return (
-    <Navbar>
+    <>
+      <Navbar />
       <Routes>
-        <Route path="/" element={<Homepage />}></Route>
+        <Route path="/" element={<Homepage />} />
       </Routes>
-    </Navbar>
+    </>
   );
 };
 
