@@ -1,9 +1,11 @@
 @import "tailwindcss";
 @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap");
+@plugin "daisyui";
 
 @theme {
   --font-urbanist: "Urbanist", sans-serif;
   --font-jakarta: "Plus Jakarta Sans", sans-serif;
   --color-primary: #b8fd03;
   --color-background: #525658;
+  --color-backgroundBlack: #080d10;
 }

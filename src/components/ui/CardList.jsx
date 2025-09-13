@@ -14,8 +14,8 @@ const CardList = (props) => {
         {props.data
           ? props.data.map((e) => {
               return (
-                <Link props={e}>
-                  <div className="flex justify-between items-center" key={e.item.id}>
+                <Link props={e} key={e.item.id}>
+                  <div className="flex justify-between items-center">
                     <div className="flex items-center gap-2">
                       <img src={e.item.small} className="w-4 h-4 rounded-full" alt="" />
                       <h1>{e.item.name}</h1>

@@ -28,7 +28,7 @@ const Navbar = () => {
   }, []);
   // console.log(globalData);
   return (
-    <nav className="fixed z-50 top-0 left-0 right-0 px-10 pt-4 pb-6 border-b border-background flex flex-col gap-5">
+    <nav className="bg-[#080D10] fixed z-50 top-0 left-0 right-0 px-10 pt-4 pb-6 border-b border-background flex flex-col gap-5">
       <div className="flex gap-4 items-center">
         <div className="flex items-center gap-2">
           <h1 className="text-white text-xs">Coins : </h1>
