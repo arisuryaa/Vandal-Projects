@@ -8,7 +8,7 @@ const CardList = (props) => {
         <div className="flex items-center gap-2">
           <h1>{props.title}</h1>
         </div>
-        <Link>View More</Link>
+        <Link className="hover:border-b duration-200 transition-all">{`View More >`}</Link>
       </div>
       <div className="flex flex-col gap-2 justify-between h-full py-3">
         {props.data

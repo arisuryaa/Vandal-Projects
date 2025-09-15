@@ -4,12 +4,32 @@ import Card from "../components/ui/Card";
 import CardList from "../components/ui/CardList";
 import { axiosInstance } from "../lib/axios";
 import { Link } from "react-router";
+import { Line } from "react-chartjs-2";
+import { CiStar } from "react-icons/ci";
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from "chart.js";
+
+// ini WAJIB biar chart.js kenal "category" scale
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+
 const apiKey = import.meta.env.VITE_API_KEY;
 
 const Homepage = () => {
   const globalData = useSelector((state) => state.dataGlobal);
   const [dataTrending, setDataTrending] = useState([]);
   const [dataMarkets, setDataMarkets] = useState([]);
+  const [pagination, setPagination] = useState(1);
+  const [chartData, setChartData] = useState({});
+  const options = {
+    responsive: true,
+    maintainAspectRatio: false, // biar bisa ikut height container
+    plugins: { legend: { display: false }, tooltip: { enabled: false } },
+    scales: { x: { display: false }, y: { display: false } },
+    scales: {
+      x: { display: false }, // hilangkan axis X
+      y: { display: false }, // hilangkan axis Y
+    },
+  };
+
   const newArr = dataTrending.slice(0, 3);
   const gainerArr = dataTrending.slice(4, 7);
   const getDataTrending = async () => {
@@ -40,15 +60,54 @@ const Homepage = () => {
     }
   };
 
+  const getDataChart = async (id = "bitcoin") => {
+    try {
+      const res = await axiosInstance.get(`https://api.coingecko.com/api/v3/coins/${id}/market_chart`, {
+        params: {
+          x_cg_demo_api_key: apiKey,
+          vs_currency: "usd",
+          days: 7,
+        },
+      });
+      const prices = res.data.prices;
+      setChartData((prev) => ({
+        ...prev,
+        [id]: {
+          labels: prices.map((p) => new Date(p[0]).toLocaleDateString("en-US", { month: "short" })),
+          datasets: [
+            {
+              data: prices.map((p) => p[1]),
+              borderColor: "red",
+              fill: false,
+              tension: 0.25,
+              pointRadius: 0,
+              borderWidth: 1.5,
+            },
+          ],
+        },
+      }));
+      // console.log(prices);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  console.log(chartData);
   useEffect(() => {
     getDataTrending();
     getDataMarkets();
+    getDataChart();
   }, []);
 
-  console.log(dataMarkets);
-  // console.log(globalData);
+  useEffect(() => {
+    if (dataMarkets.length > 0) {
+      dataMarkets.map((e) => {
+        getDataChart(e.id);
+      });
+    }
+  }, [dataMarkets]);
+
   return (
-    <div className="pt-40 px-10 text-white">
+    <div className="pt-32 px-10 text-white">
       <div className="flex flex-col gap-2">
         <h1 className="text-white text-2xl font-semibold">Cryptocurrencies Price by Market Cap </h1>
 
@@ -59,8 +118,18 @@ const Homepage = () => {
       </div>
       <div className="grid grid-cols-3 gap-2 w-full  my-8">
         <div className="flex flex-col gap-2 ">
-          <Card className="w-full" title={"$ " + globalData?.data?.total_market_cap?.usd.toLocaleString("en-US")} description={"Total Market Cap"} />
-          <Card className="w-full" title={"$ " + globalData?.data?.total_volume?.usd.toLocaleString("en-US")} description={"24h Total Trading Volume"} />
+          <Card
+            chart={<div className="w-full h-[60px]">{chartData.bitcoin ? <Line data={chartData.bitcoin} options={options} /> : <p>Loading...</p>}</div>}
+            className="w-full"
+            title={"$ " + globalData?.data?.total_market_cap?.usd.toLocaleString("en-US")}
+            description={"Total Market Cap"}
+          />
+          <Card
+            className="w-full"
+            title={"$ " + globalData?.data?.total_volume?.usd.toLocaleString("en-US")}
+            description={"24h Total Trading Volume"}
+            chart={<div className="w-full h-[60px]">{chartData.bitcoin ? <Line data={chartData.bitcoin} options={options} /> : <p>Loading...</p>}</div>}
+          />
         </div>
 
         <div className="">
@@ -72,15 +141,14 @@ const Homepage = () => {
       </div>
 
       <div className="flex items-center gap-8 pb-4 pt-6 border-b border-background mb-4 text-white opacity-70">
-        <Link>All</Link>
-        <Link>Binance Launchpool</Link>
-        <Link>Layer 2</Link>
-        <Link>Stablecoin</Link>
+        <Link className="pb-2 text-primary opacity-100">All</Link>
+        <Link className="pb-2 hover:border-b-2 transition-all border-primary">Binance Launchpool</Link>
+        <Link className="pb-2 hover:border-b-2 transition-all border-primary">Layer 2</Link>
+        <Link className="pb-2 hover:border-b-2 transition-all border-primary">Stablecoin</Link>
       </div>
 
       <div className="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
         <table className="table bg-backgroundBlack">
-          {/* head */}
           <thead>
             <tr className="text-xs">
               <th></th>
@@ -95,30 +163,40 @@ const Homepage = () => {
             </tr>
           </thead>
           <tbody className="text-xs">
-            {/* row 1 */}
-
             {dataMarkets.length > 0
               ? dataMarkets.map((e, i) => {
                   return (
-                    <tr key={e.id}>
-                      <th>⭐</th>
+                    <tr key={e.id} className="hover:bg-gray-900 transition-all cursor-pointer">
+                      <th>
+                        <button onClick={() => alert("ok")}>
+                          <CiStar className="text-xl text-white opacity-75 cursor-pointer" />
+                        </button>
+                      </th>
                       <td>{i + 1}</td>
                       <td className="flex items-center gap-2">
                         <img src={e.image} className="w-6 h-6 rounded-full" alt="" />
-                        <p>{e.id}</p>
+                        <p className="capitalize">{e.id}</p>
+                        <p className="text-xs text-white opacity-70 uppercase">{e.symbol}</p>
                       </td>
-                      <td>Buy</td>
+                      <td className="">
+                        <h1 className="text-primary border border-primary rounded-full py-1 px-2 text-center">Buy</h1>
+                      </td>
                       <td>${e.current_price.toLocaleString("en-US")}</td>
-                      <td className={e.price_change_percentage_24h > 0 ? `text-green-500` : `text-red-500`}>{e.price_change_percentage_24h.toFixed(1) + " %"}</td>
+                      <td className={e.price_change_percentage_24h > 0 ? `text-green-500` : `text-red-500`}>{Number(e.price_change_percentage_24h).toFixed(1) + " %"}</td>
                       <td>$ {e.total_volume.toLocaleString("en-US")}</td>
                       <td>$ {e.market_cap.toLocaleString("en-US")}</td>
-                      <td></td>
+                      <td>{<div className="w-[120px] h-[60px]">{chartData[e.id] ? <Line data={chartData[e.id]} options={options} /> : <p>Loading...</p>}</div>}</td>
                     </tr>
                   );
                 })
               : null}
           </tbody>
         </table>
+      </div>
+      <div className="flex justify-center items-center gap-6 py-6">
+        <button className="cursor-pointer" onClick={() => setPagination(pagination - 1)} disabled={pagination == 1}>{`<`}</button>
+        <h1 className="bg-primary px-4 py-2 rounded-lg text-sm">{pagination}</h1>
+        <button className="cursor-pointer" onClick={() => setPagination(pagination + 1)}>{`>`}</button>
       </div>
     </div>
   );
