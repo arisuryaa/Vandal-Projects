@@ -8,7 +8,6 @@ import { Line } from "react-chartjs-2";
 import { CiStar } from "react-icons/ci";
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from "chart.js";
 
-// ini WAJIB biar chart.js kenal "category" scale
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 const apiKey = import.meta.env.VITE_API_KEY;
@@ -19,6 +18,8 @@ const Homepage = () => {
   const [dataMarkets, setDataMarkets] = useState([]);
   const [pagination, setPagination] = useState(1);
   const [chartData, setChartData] = useState({});
+  const [loading, setLoading] = useState(false);
+
   const options = {
     responsive: true,
     maintainAspectRatio: false, // biar bisa ikut height container
@@ -47,16 +48,20 @@ const Homepage = () => {
 
   const getDataMarkets = async () => {
     try {
+      setLoading(true);
       const responseMarkets = await axiosInstance.get("/coins/markets", {
         params: {
           vs_currency: "usd",
-          per_page: 20,
+          per_page: 10,
           x_cg_demo_api_key: apiKey,
+          page: pagination,
         },
       });
       setDataMarkets(responseMarkets.data);
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -86,7 +91,7 @@ const Homepage = () => {
           ],
         },
       }));
-      // console.log(prices);
+      console.log(dataMarkets);
     } catch (error) {
       console.log(error);
     }
@@ -100,11 +105,17 @@ const Homepage = () => {
 
   useEffect(() => {
     if (dataMarkets.length > 0) {
-      dataMarkets.map((e) => {
-        getDataChart(e.id);
+      dataMarkets.forEach((e, i) => {
+        setTimeout(() => {
+          getDataChart(e.id);
+        }, i * 500); // 0.5s jeda tiap request
       });
     }
   }, [dataMarkets]);
+
+  useEffect(() => {
+    getDataMarkets();
+  }, [pagination]);
 
   return (
     <div className="pt-32 px-10 text-white">
@@ -148,50 +159,62 @@ const Homepage = () => {
       </div>
 
       <div className="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
-        <table className="table bg-backgroundBlack">
-          <thead>
-            <tr className="text-xs">
-              <th></th>
-              <th>#</th>
-              <th>Coin</th>
-              <th></th>
-              <th>Price</th>
-              <th>24h</th>
-              <th>24h Volume</th>
-              <th>Market Cap</th>
-              <th>Last 7 Day</th>
-            </tr>
-          </thead>
-          <tbody className="text-xs">
-            {dataMarkets.length > 0
-              ? dataMarkets.map((e, i) => {
-                  return (
-                    <tr key={e.id} className="hover:bg-gray-900 transition-all cursor-pointer">
-                      <th>
-                        <button onClick={() => alert("ok")}>
-                          <CiStar className="text-xl text-white opacity-75 cursor-pointer" />
-                        </button>
-                      </th>
-                      <td>{i + 1}</td>
-                      <td className="flex items-center gap-2">
-                        <img src={e.image} className="w-6 h-6 rounded-full" alt="" />
-                        <p className="capitalize">{e.id}</p>
-                        <p className="text-xs text-white opacity-70 uppercase">{e.symbol}</p>
-                      </td>
-                      <td className="">
-                        <h1 className="text-primary border border-primary rounded-full py-1 px-2 text-center">Buy</h1>
-                      </td>
-                      <td>${e.current_price.toLocaleString("en-US")}</td>
-                      <td className={e.price_change_percentage_24h > 0 ? `text-green-500` : `text-red-500`}>{Number(e.price_change_percentage_24h).toFixed(1) + " %"}</td>
-                      <td>$ {e.total_volume.toLocaleString("en-US")}</td>
-                      <td>$ {e.market_cap.toLocaleString("en-US")}</td>
-                      <td>{<div className="w-[120px] h-[60px]">{chartData[e.id] ? <Line data={chartData[e.id]} options={options} /> : <p>Loading...</p>}</div>}</td>
-                    </tr>
-                  );
-                })
-              : null}
-          </tbody>
-        </table>
+        {loading ? (
+          <p>Loading...</p>
+        ) : (
+          <table className="table bg-backgroundBlack overflow-x-hidden">
+            <thead>
+              <tr className="text-xs overflow-x-hidden">
+                <th></th>
+                <th>#</th>
+                <th>Coin</th>
+                <th></th>
+                <th>Price</th>
+                <th>24h</th>
+                <th>24h Volume</th>
+                <th>Market Cap</th>
+                <th>Last 7 Day</th>
+              </tr>
+            </thead>
+            <tbody className="text-xs">
+              {dataMarkets.length > 0
+                ? dataMarkets.map((e, i) => {
+                    return (
+                      <tr key={e.id} className=" hover:bg-gray-900 transition-all cursor-pointer overflow-x-hidden">
+                        <td>
+                          <button onClick={() => alert("ok")}>
+                            <CiStar className="text-xl text-white opacity-75 cursor-pointer" />
+                          </button>
+                        </td>
+
+                        <td>{i + 1}</td>
+
+                        <td className="flex items-center gap-2 h-fit pt-7">
+                          <img src={e.image} className="w-6 h-6 rounded-full" alt="" />
+                          <p className="capitalize">{e.id}</p>
+                          <p className="text-xs text-white opacity-70 uppercase">{e.symbol}</p>
+                        </td>
+
+                        <td className="overflow-x-hidden">
+                          <h1 className="text-primary border border-primary rounded-full py-1 px-2 text-center">Buy</h1>
+                        </td>
+
+                        <td className="overflow-x-hidden">${e.current_price.toLocaleString("en-US")}</td>
+
+                        <td className={e.price_change_percentage_24h > 0 ? `text-green-500` : `text-red-500`}>{Number(e.price_change_percentage_24h).toFixed(1) + " %"}</td>
+
+                        <td>$ {e.total_volume.toLocaleString("en-US")}</td>
+
+                        <td>$ {e.market_cap.toLocaleString("en-US")}</td>
+
+                        <td>{<div className=" overflow-x-hidden w-[120px] h-[60px]">{chartData[e.id] ? <Line data={chartData[e.id]} options={options} /> : <p>Loading...</p>}</div>}</td>
+                      </tr>
+                    );
+                  })
+                : null}
+            </tbody>
+          </table>
+        )}
       </div>
       <div className="flex justify-center items-center gap-6 py-6">
         <button className="cursor-pointer" onClick={() => setPagination(pagination - 1)} disabled={pagination == 1}>{`<`}</button>
