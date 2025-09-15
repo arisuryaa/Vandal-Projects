@@ -55,6 +55,7 @@ const Homepage = () => {
           per_page: 10,
           x_cg_demo_api_key: apiKey,
           page: pagination,
+          sparkline: true,
         },
       });
       setDataMarkets(responseMarkets.data);
@@ -65,53 +66,42 @@ const Homepage = () => {
     }
   };
 
-  const getDataChart = async (id = "bitcoin") => {
-    try {
-      const res = await axiosInstance.get(`https://api.coingecko.com/api/v3/coins/${id}/market_chart`, {
-        params: {
-          x_cg_demo_api_key: apiKey,
-          vs_currency: "usd",
-          days: 7,
-        },
-      });
-      const prices = res.data.prices;
-      setChartData((prev) => ({
-        ...prev,
-        [id]: {
-          labels: prices.map((p) => new Date(p[0]).toLocaleDateString("en-US", { month: "short" })),
-          datasets: [
-            {
-              data: prices.map((p) => p[1]),
-              borderColor: "red",
-              fill: false,
-              tension: 0.25,
-              pointRadius: 0,
-              borderWidth: 1.5,
-            },
-          ],
-        },
-      }));
-      console.log(dataMarkets);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-  console.log(chartData);
+  // const getDataChart = async (id = "bitcoin") => {
+  //   try {
+  //     const res = await axiosInstance.get(`https://api.coingecko.com/api/v3/coins/${id}/market_chart`, {
+  //       params: {
+  //         x_cg_demo_api_key: apiKey,
+  //         vs_currency: "usd",
+  //         days: 7,
+  //       },
+  //     });
+  //     const prices = res.data.prices;
+  //     setChartData((prev) => ({
+  //       ...prev,
+  //       [id]: {
+  //         labels: prices.map((p) => new Date(p[0]).toLocaleDateString("en-US", { month: "short" })),
+  //         datasets: [
+  //           {
+  //             data: prices.map((p) => p[1]),
+  //             borderColor: "red",
+  //             fill: false,
+  //             tension: 0.25,
+  //             pointRadius: 0,
+  //             borderWidth: 1.5,
+  //           },
+  //         ],
+  //       },
+  //     }));
+  //     console.log(dataMarkets);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
+  // console.log(chartData);
   useEffect(() => {
     getDataTrending();
     getDataMarkets();
-    getDataChart();
   }, []);
-
-  useEffect(() => {
-    if (dataMarkets.length > 0) {
-      dataMarkets.forEach((e, i) => {
-        setTimeout(() => {
-          getDataChart(e.id);
-        }, i * 500); // 0.5s jeda tiap request
-      });
-    }
-  }, [dataMarkets]);
 
   useEffect(() => {
     getDataMarkets();
@@ -160,7 +150,7 @@ const Homepage = () => {
 
       <div className="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
         {loading ? (
-          <p>Loading...</p>
+          <p className="py-4 text-center ">Loading...</p>
         ) : (
           <table className="table bg-backgroundBlack overflow-x-hidden">
             <thead>
@@ -178,36 +168,55 @@ const Homepage = () => {
             </thead>
             <tbody className="text-xs">
               {dataMarkets.length > 0
-                ? dataMarkets.map((e, i) => {
+                ? dataMarkets.map((coin, i) => {
+                    const chartData = {
+                      labels: coin.sparkline_in_7d.price.map((_, idx) => idx),
+                      datasets: [
+                        {
+                          data: coin.sparkline_in_7d.price,
+                          borderColor: "red",
+                          fill: false,
+                          tension: 0.25,
+                          pointRadius: 0,
+                          borderWidth: 1.5,
+                        },
+                      ],
+                    };
+                    const index = (pagination - 1) * 10 + (i + 1);
+
                     return (
-                      <tr key={e.id} className=" hover:bg-gray-900 transition-all cursor-pointer overflow-x-hidden">
+                      <tr key={coin.id} className="hover:bg-gray-900 transition-all cursor-pointer">
                         <td>
                           <button onClick={() => alert("ok")}>
                             <CiStar className="text-xl text-white opacity-75 cursor-pointer" />
                           </button>
                         </td>
 
-                        <td>{i + 1}</td>
+                        <td>{index}</td>
 
                         <td className="flex items-center gap-2 h-fit pt-7">
-                          <img src={e.image} className="w-6 h-6 rounded-full" alt="" />
-                          <p className="capitalize">{e.id}</p>
-                          <p className="text-xs text-white opacity-70 uppercase">{e.symbol}</p>
+                          <img src={coin.image} className="w-6 h-6 rounded-full" alt="" />
+                          <p className="capitalize">{coin.id}</p>
+                          <p className="text-xs text-white opacity-70 uppercase">{coin.symbol}</p>
                         </td>
 
                         <td className="overflow-x-hidden">
                           <h1 className="text-primary border border-primary rounded-full py-1 px-2 text-center">Buy</h1>
                         </td>
 
-                        <td className="overflow-x-hidden">${e.current_price.toLocaleString("en-US")}</td>
+                        <td className="overflow-x-hidden">${coin.current_price.toLocaleString("en-US")}</td>
 
-                        <td className={e.price_change_percentage_24h > 0 ? `text-green-500` : `text-red-500`}>{Number(e.price_change_percentage_24h).toFixed(1) + " %"}</td>
+                        <td className={coin.price_change_percentage_24h > 0 ? `text-green-500` : `text-red-500`}>{Number(coin.price_change_percentage_24h).toFixed(1) + " %"}</td>
 
-                        <td>$ {e.total_volume.toLocaleString("en-US")}</td>
+                        <td>$ {coin.total_volume.toLocaleString("en-US")}</td>
 
-                        <td>$ {e.market_cap.toLocaleString("en-US")}</td>
+                        <td>$ {coin.market_cap.toLocaleString("en-US")}</td>
 
-                        <td>{<div className=" overflow-x-hidden w-[120px] h-[60px]">{chartData[e.id] ? <Line data={chartData[e.id]} options={options} /> : <p>Loading...</p>}</div>}</td>
+                        <td>
+                          <div className="w-full h-[60px]">
+                            <Line data={chartData} options={{ plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } }} />
+                          </div>
+                        </td>
                       </tr>
                     );
                   })
