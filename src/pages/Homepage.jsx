@@ -22,12 +22,12 @@ const Homepage = () => {
 
   const options = {
     responsive: true,
-    maintainAspectRatio: false, // biar bisa ikut height container
+    maintainAspectRatio: false,
     plugins: { legend: { display: false }, tooltip: { enabled: false } },
     scales: { x: { display: false }, y: { display: false } },
     scales: {
-      x: { display: false }, // hilangkan axis X
-      y: { display: false }, // hilangkan axis Y
+      x: { display: false },
+      y: { display: false },
     },
   };
 
@@ -66,41 +66,42 @@ const Homepage = () => {
     }
   };
 
-  // const getDataChart = async (id = "bitcoin") => {
-  //   try {
-  //     const res = await axiosInstance.get(`https://api.coingecko.com/api/v3/coins/${id}/market_chart`, {
-  //       params: {
-  //         x_cg_demo_api_key: apiKey,
-  //         vs_currency: "usd",
-  //         days: 7,
-  //       },
-  //     });
-  //     const prices = res.data.prices;
-  //     setChartData((prev) => ({
-  //       ...prev,
-  //       [id]: {
-  //         labels: prices.map((p) => new Date(p[0]).toLocaleDateString("en-US", { month: "short" })),
-  //         datasets: [
-  //           {
-  //             data: prices.map((p) => p[1]),
-  //             borderColor: "red",
-  //             fill: false,
-  //             tension: 0.25,
-  //             pointRadius: 0,
-  //             borderWidth: 1.5,
-  //           },
-  //         ],
-  //       },
-  //     }));
-  //     console.log(dataMarkets);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
-  // console.log(chartData);
+  const getDataChart = async (id = "bitcoin") => {
+    try {
+      const res = await axiosInstance.get(`https://api.coingecko.com/api/v3/coins/${id}/market_chart`, {
+        params: {
+          x_cg_demo_api_key: apiKey,
+          vs_currency: "usd",
+          days: 7,
+        },
+      });
+      const prices = res.data.prices;
+      setChartData((prev) => ({
+        ...prev,
+        [id]: {
+          labels: prices.map((p) => new Date(p[0]).toLocaleDateString("en-US", { month: "short" })),
+          datasets: [
+            {
+              data: prices.map((p) => p[1]),
+              borderColor: "red",
+              fill: false,
+              tension: 0.25,
+              pointRadius: 0,
+              borderWidth: 1.5,
+            },
+          ],
+        },
+      }));
+      console.log(dataMarkets);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     getDataTrending();
     getDataMarkets();
+    getDataChart();
   }, []);
 
   useEffect(() => {
@@ -191,32 +192,35 @@ const Homepage = () => {
                             <CiStar className="text-xl text-white opacity-75 cursor-pointer" />
                           </button>
                         </td>
+                        <Link className="contents" to={`/detail/${coin.id}`}>
+                          <td>{index}</td>
 
-                        <td>{index}</td>
+                          <td>
+                            <div className="flex items-center gap-2 h-fit">
+                              <img src={coin.image} className="w-6 h-6 rounded-full" alt="" />
+                              <p className="capitalize">{coin.id}</p>
+                              <p className="text-xs text-white opacity-70 uppercase">{coin.symbol}</p>
+                            </div>
+                          </td>
 
-                        <td className="flex items-center gap-2 h-fit pt-7">
-                          <img src={coin.image} className="w-6 h-6 rounded-full" alt="" />
-                          <p className="capitalize">{coin.id}</p>
-                          <p className="text-xs text-white opacity-70 uppercase">{coin.symbol}</p>
-                        </td>
+                          <td className="overflow-x-hidden">
+                            <h1 className="text-primary border border-primary rounded-full py-1 px-2 text-center">Buy</h1>
+                          </td>
 
-                        <td className="overflow-x-hidden">
-                          <h1 className="text-primary border border-primary rounded-full py-1 px-2 text-center">Buy</h1>
-                        </td>
+                          <td className="overflow-x-hidden">${coin.current_price.toLocaleString("en-US")}</td>
 
-                        <td className="overflow-x-hidden">${coin.current_price.toLocaleString("en-US")}</td>
+                          <td className={coin.price_change_percentage_24h > 0 ? `text-green-500` : `text-red-500`}>{Number(coin.price_change_percentage_24h).toFixed(1) + " %"}</td>
 
-                        <td className={coin.price_change_percentage_24h > 0 ? `text-green-500` : `text-red-500`}>{Number(coin.price_change_percentage_24h).toFixed(1) + " %"}</td>
+                          <td>$ {coin.total_volume.toLocaleString("en-US")}</td>
 
-                        <td>$ {coin.total_volume.toLocaleString("en-US")}</td>
+                          <td>$ {coin.market_cap.toLocaleString("en-US")}</td>
 
-                        <td>$ {coin.market_cap.toLocaleString("en-US")}</td>
-
-                        <td>
-                          <div className="w-full h-[60px]">
-                            <Line data={chartData} options={{ plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } }} />
-                          </div>
-                        </td>
+                          <td>
+                            <div className="w-full h-[60px]">
+                              <Line data={chartData} options={{ plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } }} />
+                            </div>
+                          </td>
+                        </Link>
                       </tr>
                     );
                   })

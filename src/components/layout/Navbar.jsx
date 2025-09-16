@@ -41,9 +41,11 @@ const Navbar = () => {
       </div> */}
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-10">
-          <img src="./logo.svg" />
+          <img src="/logo.svg" />
           <div className="flex items-center gap-5">
-            <Link className="text-sm font-semibold text-primary">Homepage</Link>
+            <Link className="text-sm " to={"/"}>
+              Homepage
+            </Link>
             <Link className="text-sm ">Community</Link>
             <Link className="text-sm ">Blog</Link>
           </div>
