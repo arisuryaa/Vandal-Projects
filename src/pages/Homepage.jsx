@@ -149,7 +149,7 @@ const Homepage = () => {
         <Link className="pb-2 hover:border-b-2 transition-all border-primary">Stablecoin</Link>
       </div>
 
-      <div className="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
+      <div className="overflow-x-auto rounded-box  bg-base-100">
         {loading ? (
           <p className="py-4 text-center ">Loading...</p>
         ) : (
