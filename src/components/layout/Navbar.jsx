@@ -60,7 +60,9 @@ const Navbar = () => {
             <FaStar />
             <h1>Watchlist</h1>
           </Link>
-          <Link className="bg-primary px-8 py-2 rounded-md font-bold">Login</Link>
+          <Link to={"/login"} className="bg-primary px-8 py-2 rounded-md font-bold">
+            Login
+          </Link>
         </div>
       </div>
     </nav>
