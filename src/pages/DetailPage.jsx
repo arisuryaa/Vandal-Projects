@@ -109,7 +109,7 @@ const DetailPage = () => {
   };
   useEffect(() => {
     getDataDetail();
-  }, []);
+  }, [id]);
 
   // console.log(dataCoin);
 

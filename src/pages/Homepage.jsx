@@ -7,14 +7,15 @@ import { Link } from "react-router";
 import { Line } from "react-chartjs-2";
 import { CiStar } from "react-icons/ci";
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from "chart.js";
-
+import { useDispatch } from "react-redux";
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 const apiKey = import.meta.env.VITE_API_KEY;
 
 const Homepage = () => {
+  const dispatch = useDispatch();
   const globalData = useSelector((state) => state.dataGlobal);
-  const [dataTrending, setDataTrending] = useState([]);
+  const dataTrending = useSelector((state) => state.dataTrending);
   const [dataMarkets, setDataMarkets] = useState([]);
   const [pagination, setPagination] = useState(1);
   const [chartData, setChartData] = useState({});
@@ -31,8 +32,6 @@ const Homepage = () => {
     },
   };
 
-  const newArr = dataTrending.slice(0, 3);
-  const gainerArr = dataTrending.slice(4, 7);
   const getDataTrending = async () => {
     try {
       const responseTrending = await axiosInstance.get("/search/trending", {
@@ -40,7 +39,10 @@ const Homepage = () => {
           x_cg_demo_api_key: apiKey,
         },
       });
-      setDataTrending(responseTrending.data.coins);
+      dispatch({
+        type: "STORE_DATA_TRENDING",
+        payload: responseTrending.data.coins,
+      });
     } catch (error) {
       console.log(error);
     }
@@ -92,11 +94,13 @@ const Homepage = () => {
           ],
         },
       }));
-      console.log(dataMarkets);
+      // console.log(dataMarkets);
     } catch (error) {
       console.log(error);
     }
   };
+
+  // console.log(dataTrending);
 
   useEffect(() => {
     getDataTrending();
@@ -135,10 +139,10 @@ const Homepage = () => {
         </div>
 
         <div className="">
-          <CardList className="w-full h-full" title="🔥 Trending" data={newArr} />
+          <CardList className="w-full h-full" title="🔥 Trending" data={dataTrending.data.slice(0, 3)} />
         </div>
         <div className="">
-          <CardList className="w-full h-full" title="🚀 Top Gainer" data={gainerArr} />
+          <CardList className="w-full h-full" title="🚀 Top Gainer" data={dataTrending.data.slice(0, 3)} />
         </div>
       </div>
 
