@@ -15,7 +15,7 @@ const Navbar = () => {
   const [inputActive, setInputActive] = useState(false);
   const dataTrending = useSelector((state) => state.dataTrending);
   const [text, setText] = useState("");
-  const [debounceText] = useDebounce(text, 1000);
+  const [debounceText] = useDebounce(text, 800);
   const [resultSearch, setResultSearch] = useState();
 
   const getDataGlobal = async () => {
@@ -43,7 +43,7 @@ const Navbar = () => {
     }
   };
 
-  console.log(resultSearch);
+  // console.log(resultSearch);
   // console.log(`text : ${text}`);
   // console.log(`debounce : ${debounceText}`);
   useEffect(() => {

@@ -1,7 +1,27 @@
 import React from "react";
 import { FaFacebook, FaGoogle } from "react-icons/fa";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 
-const LoginPage = () => {
+const schema = z.object({
+  username: z.string().max(10).min(4, "Username Invalid"),
+  password: z.string().min(4, "Password Invalid"),
+});
+
+const RegisterPage = () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(schema),
+  });
+
+  const HandleOnSubmit = (data) => {
+    console.log(data);
+  };
+
   return (
     <div className="min-h-screen  flex">
       {/* Left Section - Form */}
@@ -12,23 +32,25 @@ const LoginPage = () => {
 
           {/* Title */}
           <div className="text-center mb-8">
-            <h1 className="text-white text-2xl font-bold mb-2">Selamat Datang kembali</h1>
-            <p className="text-gray-300 text-sm">Masuk Dengan Akun Anda</p>
+            <h1 className="text-white text-2xl font-bold mb-2">Please Register</h1>
+            <p className="text-gray-300 text-sm">Create Your Account</p>
           </div>
 
           {/* Form */}
-          <form className="space-y-6">
+          <form className="space-y-6" onSubmit={handleSubmit(HandleOnSubmit)}>
             <div>
-              <label htmlFor="email" className="block text-white text-sm font-medium mb-2">
-                Email
+              <label htmlFor="username" className="block text-white text-sm font-medium mb-2">
+                Username
               </label>
               <input
-                id="email"
-                type="email"
-                placeholder="Email"
+                id="username"
+                type="text"
+                placeholder="username"
+                {...register("username")}
                 className="w-full px-4 py-3 bg-transparent border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
               />
             </div>
+            {errors.username && <p className="text-red-500 text-sm">{errors.username.message}</p>}
 
             <div>
               <label htmlFor="password" className="block text-white text-sm font-medium mb-2">
@@ -38,8 +60,10 @@ const LoginPage = () => {
                 id="password"
                 type="password"
                 placeholder="Password"
+                {...register("password")}
                 className="w-full px-4 py-3 bg-transparent border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
               />
+              {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
             </div>
 
             <div className="text-left">
@@ -103,4 +127,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default RegisterPage;
