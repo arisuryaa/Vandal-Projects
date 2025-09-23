@@ -3,6 +3,7 @@ import { FaFacebook, FaGoogle } from "react-icons/fa";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useNavigate } from "react-router";
 
 const schema = z.object({
   username: z.string().max(10).min(4, "Username Invalid"),
@@ -10,6 +11,8 @@ const schema = z.object({
 });
 
 const RegisterPage = () => {
+  const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
@@ -20,6 +23,7 @@ const RegisterPage = () => {
 
   const HandleOnSubmit = (data) => {
     console.log(data);
+    navigate("/");
   };
 
   return (
@@ -73,7 +77,7 @@ const RegisterPage = () => {
             </div>
 
             <button type="submit" className="w-full bg-primary cursor-pointer hover:bg-green-600 text-white font-medium py-3 px-4 rounded-lg transition duration-200">
-              Masuk Akun
+              Buat Akun
             </button>
           </form>
 
@@ -106,9 +110,9 @@ const RegisterPage = () => {
           {/* Register Link */}
           <div className="text-center mt-6">
             <p className="text-gray-400 text-sm">
-              Belum Mempunyai Akun?{" "}
-              <a href="/register" className="text-green-500 hover:text-green-400">
-                Buat Akun
+              Sudah Mempunyai Akun?{" "}
+              <a href="/login" className="text-green-500 hover:text-green-400">
+                Masuk Akun
               </a>
             </p>
           </div>

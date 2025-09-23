@@ -4,6 +4,7 @@ import { axiosInstance } from "../lib/axios";
 import { CiStar } from "react-icons/ci";
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from "chart.js";
 import { Line } from "react-chartjs-2";
+import { useDispatch } from "react-redux";
 import Navbar from "../components/layout/Navbar";
 const apiKey = import.meta.env.VITE_API_KEY;
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
@@ -13,6 +14,7 @@ const DetailPage = () => {
   const [percent, setPercent] = useState(null);
   const [chartData, setChartData] = useState([]);
   const { id } = useParams();
+  const dispatch = useDispatch();
 
   const options = {
     responsive: true,
@@ -94,6 +96,24 @@ const DetailPage = () => {
     }
   };
 
+  const addToWatchlist = () => {
+    const newObj = {
+      sparkline_in_7d: dataCoin.market_data.sparkline_7d,
+      id: dataCoin.id,
+      image: dataCoin.image.small,
+      symbol: dataCoin.symbol,
+      current_price: dataCoin.market_data.current_price.usd,
+      price_change_percentage_24h: dataCoin.market_data.price_change_percentage_24h,
+      total_volume: dataCoin.market_data.total_volume.usd,
+      market_cap: dataCoin.market_data.market_cap.usd,
+    };
+    dispatch({
+      type: "STORE_DATA_WATCHLIST",
+      payload: newObj,
+    });
+    alert("SUCCESS");
+  };
+
   const getDataDetail = async () => {
     try {
       const response = await axiosInstance.get(`/coins/${id}`, {
@@ -112,8 +132,6 @@ const DetailPage = () => {
     getDataDetail();
   }, [id]);
 
-  // console.log(dataCoin);
-
   useEffect(() => {
     if (!dataCoin?.market_data) return; // guard biar ga error pas data masih kosong
     const currentPrice = dataCoin.market_data.current_price?.usd;
@@ -127,7 +145,7 @@ const DetailPage = () => {
     getDataChart(id);
   }, [dataCoin]);
 
-  console.log(dataCoin);
+  // console.log(dataCoin);
 
   return (
     <>
@@ -153,12 +171,12 @@ const DetailPage = () => {
             <div className="w-full flex gap-1">
               <button type="submit" className="flex gap-3 justify-center items-center w-[85%] bg-primary  text-left px-4 py-2  rounded-lg shadow shadow-primary">
                 <div className=" flex text-left items-center w-full justify-start">
-                  <Link to={"/"}>
+                  <Link to={"/"} className="cursor-pointer">
                     <h1>Add to Portofolio</h1>
                   </Link>
                 </div>
               </button>
-              <button type="submit" className="w-[15%] bg-primary flex justify-center items-center rounded-lg">
+              <button type="submit" onClick={addToWatchlist} className="w-[15%] bg-primary flex justify-center items-center rounded-lg cursor-pointer">
                 <CiStar className=" text-lg text-white opacity-75 cursor-pointer" />
               </button>
             </div>

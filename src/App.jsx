@@ -5,15 +5,16 @@ import Navbar from "./components/layout/Navbar";
 import DetailPage from "./pages/DetailPage";
 import LoginPage from "./pages/authPages/LoginPage";
 import RegisterPage from "./pages/authPages/RegisterPage";
+import WatchlistPage from "./pages/WatchlistPage";
 const App = () => {
   return (
     <>
-      {/* <Navbar /> */}
       <Routes>
         <Route path="/" element={<Homepage />} />
         <Route path="/detail/:id" element={<DetailPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/watchlist" element={<WatchlistPage />} />
       </Routes>
     </>
   );

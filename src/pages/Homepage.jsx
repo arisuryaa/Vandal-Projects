@@ -100,6 +100,15 @@ const Homepage = () => {
     }
   };
 
+  const addToWatchlist = (coin) => {
+    console.log(coin);
+    dispatch({
+      type: "STORE_DATA_WATCHLIST",
+      payload: coin,
+    });
+    alert("SUCCESS");
+  };
+
   useEffect(() => {
     getDataTrending();
     getDataMarkets();
@@ -192,7 +201,7 @@ const Homepage = () => {
                       return (
                         <tr key={coin.id} className="hover:bg-gray-900 transition-all cursor-pointer">
                           <td>
-                            <button onClick={() => alert("ok")}>
+                            <button onClick={() => addToWatchlist(coin)}>
                               <CiStar className="text-xl text-white opacity-75 cursor-pointer" />
                             </button>
                           </td>

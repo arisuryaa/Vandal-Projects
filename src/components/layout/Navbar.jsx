@@ -170,7 +170,7 @@ const Navbar = () => {
             <FaChartPie />
             <h1>Portofolio</h1>
           </Link>
-          <Link className="flex items-center gap-2">
+          <Link className="flex items-center gap-2" to={"/watchlist"}>
             <FaStar />
             <h1>Watchlist</h1>
           </Link>
