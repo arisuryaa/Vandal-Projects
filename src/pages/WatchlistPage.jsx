@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import Navbar from "../components/layout/Navbar";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { FaStar } from "react-icons/fa";
 
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from "chart.js";
@@ -10,10 +10,19 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, T
 
 const WatchlistPage = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const dataWatchlist = useSelector((state) => state.dataWatchlist);
 
-  console.log(dataWatchlist.data.length);
+  console.log(dataWatchlist);
+
+  const removeToWatchlist = (id) => {
+    dispatch({
+      type: "DELETE_DATA_WATCHLIST",
+      payload: id,
+    });
+    alert("sukses");
+  };
 
   useEffect(() => {
     if (dataWatchlist.data.length <= 0) {
@@ -64,7 +73,7 @@ const WatchlistPage = () => {
                     return (
                       <tr key={coin.id} className="hover:bg-gray-900 transition-all cursor-pointer">
                         <td>
-                          <button onClick={() => addToWatchlist(coin.id)}>
+                          <button onClick={() => removeToWatchlist(coin.id)}>
                             <FaStar className="text-xl text-orange-400  opacity-75 cursor-pointer" />
                           </button>
                         </td>

@@ -1,6 +1,7 @@
 import React from "react";
 import { FaFacebook, FaGoogle } from "react-icons/fa";
 
+
 const LoginPage = () => {
   return (
     <div className="min-h-screen  flex">
