@@ -6,6 +6,7 @@ import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement
 import { Line } from "react-chartjs-2";
 import { useDispatch } from "react-redux";
 import Navbar from "../components/layout/Navbar";
+import useDocumentTitle from "../hook/useDocumentTitle";
 const apiKey = import.meta.env.VITE_API_KEY;
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -14,6 +15,7 @@ const DetailPage = () => {
   const [percent, setPercent] = useState(null);
   const [chartData, setChartData] = useState([]);
   const { id } = useParams();
+  useDocumentTitle(`Vandal | ${id} Detail`);
   const dispatch = useDispatch();
 
   const options = {

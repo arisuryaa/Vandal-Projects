@@ -6,9 +6,11 @@ import { FaStar } from "react-icons/fa";
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from "chart.js";
 import { Link, useNavigate } from "react-router";
 import { Line } from "react-chartjs-2";
+import useDocumentTitle from "../hook/useDocumentTitle";
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 const WatchlistPage = () => {
+  useDocumentTitle("Vandal | Watchlist Page");
   const navigate = useNavigate();
   const dispatch = useDispatch();
 

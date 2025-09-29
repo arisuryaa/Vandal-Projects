@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useNavigate } from "react-router";
+import useDocumentTitle from "../../hook/useDocumentTitle";
 
 const schema = z.object({
   username: z.string().max(10).min(4, "Username Invalid"),
@@ -12,7 +13,7 @@ const schema = z.object({
 
 const RegisterPage = () => {
   const navigate = useNavigate();
-
+  useDocumentTitle("Vandal | Register");
   const {
     register,
     handleSubmit,

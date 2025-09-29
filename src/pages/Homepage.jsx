@@ -1,123 +1,34 @@
-import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import React from "react";
 import Card from "../components/ui/Card";
 import CardList from "../components/ui/CardList";
-import { axiosInstance } from "../lib/axios";
+import { useSelector } from "react-redux";
 import { Link } from "react-router";
 import { Line } from "react-chartjs-2";
 import { CiStar } from "react-icons/ci";
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from "chart.js";
-import { useDispatch } from "react-redux";
 import Navbar from "../components/layout/Navbar";
+import useDocumentTitle from "../hook/useDocumentTitle";
+import { useGetDataTrending } from "../hook/useGetDataTrending";
+import useGetDataMarket from "../hook/useGetDataMarket";
+import useGetDataChart from "../hook/useGetDataChart";
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
-const apiKey = import.meta.env.VITE_API_KEY;
-
 const Homepage = () => {
-  const dispatch = useDispatch();
-  const globalData = useSelector((state) => state.dataGlobal);
+  useDocumentTitle("Vandal | Homepage");
+  useGetDataTrending();
+  useGetDataChart();
   const dataTrending = useSelector((state) => state.dataTrending);
-  const [dataMarkets, setDataMarkets] = useState([]);
-  const [pagination, setPagination] = useState(1);
-  const [chartData, setChartData] = useState({});
-  const [loading, setLoading] = useState(false);
-
-  const options = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: { legend: { display: false }, tooltip: { enabled: false } },
-    scales: { x: { display: false }, y: { display: false } },
-    scales: {
-      x: { display: false },
-      y: { display: false },
-    },
-  };
-
-  const getDataTrending = async () => {
-    try {
-      const responseTrending = await axiosInstance.get("/search/trending", {
-        params: {
-          x_cg_demo_api_key: apiKey,
-        },
-      });
-      dispatch({
-        type: "STORE_DATA_TRENDING",
-        payload: responseTrending.data.coins,
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const getDataMarkets = async () => {
-    try {
-      setLoading(true);
-      const responseMarkets = await axiosInstance.get("/coins/markets", {
-        params: {
-          vs_currency: "usd",
-          per_page: 10,
-          x_cg_demo_api_key: apiKey,
-          page: pagination,
-          sparkline: true,
-        },
-      });
-      setDataMarkets(responseMarkets.data);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const getDataChart = async (id = "bitcoin") => {
-    try {
-      const res = await axiosInstance.get(`https://api.coingecko.com/api/v3/coins/${id}/market_chart`, {
-        params: {
-          x_cg_demo_api_key: apiKey,
-          vs_currency: "usd",
-          days: 7,
-        },
-      });
-      const prices = res.data.prices;
-      setChartData((prev) => ({
-        ...prev,
-        [id]: {
-          labels: prices.map((p) => new Date(p[0]).toLocaleDateString("en-US", { month: "short" })),
-          datasets: [
-            {
-              data: prices.map((p) => p[1]),
-              borderColor: "red",
-              fill: false,
-              tension: 0.25,
-              pointRadius: 0,
-              borderWidth: 1.5,
-            },
-          ],
-        },
-      }));
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  const globalData = useSelector((state) => state.dataGlobal);
+  const { dataMarkets, loading, pagination, setPagination } = useGetDataMarket();
+  const { chartData, options } = useGetDataChart();
 
   const addToWatchlist = (coin) => {
-    console.log(coin);
     dispatch({
       type: "STORE_DATA_WATCHLIST",
       payload: coin,
     });
     alert("SUCCESS");
   };
-
-  useEffect(() => {
-    getDataTrending();
-    getDataMarkets();
-    getDataChart();
-  }, []);
-
-  useEffect(() => {
-    getDataMarkets();
-  }, [pagination]);
 
   return (
     <>

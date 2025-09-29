@@ -1,8 +1,9 @@
 import React from "react";
 import { FaFacebook, FaGoogle } from "react-icons/fa";
-
+import useDocumentTitle from "../../hook/useDocumentTitle";
 
 const LoginPage = () => {
+  useDocumentTitle("Vandal | Login Page");
   return (
     <div className="min-h-screen  flex">
       {/* Left Section - Form */}
