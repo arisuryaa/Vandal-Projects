@@ -1,9 +1,30 @@
-import React from "react";
+import React, { useState } from "react";
 import { FaFacebook, FaGoogle } from "react-icons/fa";
 import useDocumentTitle from "../../hook/useDocumentTitle";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../../firebase";
 
 const LoginPage = () => {
   useDocumentTitle("Vandal | Login Page");
+  const [email, setEmail] = useState();
+  const [password, setPassword] = useState();
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const token = await userCredential.user.getIdToken();
+
+      console.log(token);
+      alert("ok");
+    } catch (error) {
+      alert("invalid");
+      console.log(error);
+    }
+    setEmail("");
+    setPassword("");
+  };
+
   return (
     <div className="min-h-screen  flex">
       {/* Left Section - Form */}
@@ -19,12 +40,14 @@ const LoginPage = () => {
           </div>
 
           {/* Form */}
-          <form className="space-y-6">
+          <form className="space-y-6" onSubmit={handleLogin}>
             <div>
               <label htmlFor="email" className="block text-white text-sm font-medium mb-2">
                 Email
               </label>
               <input
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 id="email"
                 type="email"
                 placeholder="Email"
@@ -37,6 +60,8 @@ const LoginPage = () => {
                 Password
               </label>
               <input
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 id="password"
                 type="password"
                 placeholder="Password"

@@ -5,9 +5,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useNavigate } from "react-router";
 import useDocumentTitle from "../../hook/useDocumentTitle";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../../firebase";
 
 const schema = z.object({
-  username: z.string().max(10).min(4, "Username Invalid"),
+  email: z.string("email Invalid"),
   password: z.string().min(4, "Password Invalid"),
 });
 
@@ -22,9 +24,15 @@ const RegisterPage = () => {
     resolver: zodResolver(schema),
   });
 
-  const HandleOnSubmit = (data) => {
-    console.log(data);
-    navigate("/");
+  const HandleOnSubmit = async ({ email, password }) => {
+    try {
+      const register = await createUserWithEmailAndPassword(auth, email, password);
+      console.log(register);
+      alert("sukses");
+    } catch (error) {
+      console.log(error);
+    }
+    // navigate("/");
   };
 
   return (
@@ -45,17 +53,17 @@ const RegisterPage = () => {
           <form className="space-y-6" onSubmit={handleSubmit(HandleOnSubmit)}>
             <div>
               <label htmlFor="username" className="block text-white text-sm font-medium mb-2">
-                Username
+                Email
               </label>
               <input
-                id="username"
-                type="text"
-                placeholder="username"
-                {...register("username")}
+                id="email"
+                type="email"
+                placeholder="email"
+                {...register("email")}
                 className="w-full px-4 py-3 bg-transparent border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
               />
             </div>
-            {errors.username && <p className="text-red-500 text-sm">{errors.username.message}</p>}
+            {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
 
             <div>
               <label htmlFor="password" className="block text-white text-sm font-medium mb-2">

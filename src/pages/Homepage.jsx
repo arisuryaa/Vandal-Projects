@@ -11,24 +11,16 @@ import useDocumentTitle from "../hook/useDocumentTitle";
 import { useGetDataTrending } from "../hook/useGetDataTrending";
 import useGetDataMarket from "../hook/useGetDataMarket";
 import useGetDataChart from "../hook/useGetDataChart";
+import useAddToWatchlist from "../hook/useAddToWatchlist";
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 const Homepage = () => {
   useDocumentTitle("Vandal | Homepage");
   useGetDataTrending();
-  useGetDataChart();
   const dataTrending = useSelector((state) => state.dataTrending);
   const globalData = useSelector((state) => state.dataGlobal);
   const { dataMarkets, loading, pagination, setPagination } = useGetDataMarket();
   const { chartData, options } = useGetDataChart();
-
-  const addToWatchlist = (coin) => {
-    dispatch({
-      type: "STORE_DATA_WATCHLIST",
-      payload: coin,
-    });
-    alert("SUCCESS");
-  };
 
   return (
     <>
@@ -112,7 +104,7 @@ const Homepage = () => {
                       return (
                         <tr key={coin.id} className="hover:bg-gray-900 transition-all cursor-pointer">
                           <td>
-                            <button onClick={() => addToWatchlist(coin)}>
+                            <button onClick={() => useAddToWatchlist(coin)}>
                               <CiStar className="text-xl text-white opacity-75 cursor-pointer" />
                             </button>
                           </td>
