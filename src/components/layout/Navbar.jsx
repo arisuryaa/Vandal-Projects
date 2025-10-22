@@ -11,7 +11,6 @@ const apiKey = import.meta.env.VITE_API_KEY;
 
 const Navbar = () => {
   const dispatch = useDispatch();
-  const globalData = useSelector((state) => state.dataGlobal);
   const [inputActive, setInputActive] = useState(false);
   const dataTrending = useSelector((state) => state.dataTrending);
   const [text, setText] = useState("");
@@ -43,9 +42,6 @@ const Navbar = () => {
     }
   };
 
-  // console.log(resultSearch);
-  // console.log(`text : ${text}`);
-  // console.log(`debounce : ${debounceText}`);
   useEffect(() => {
     getDataGlobal();
   }, []);

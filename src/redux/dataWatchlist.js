@@ -11,8 +11,8 @@ export const dataWatchlistReducer = (state = DEFAULT_STATE, action) => {
   } else if (action.type == "DELETE_DATA_WATCHLIST") {
     const newState = state.data.filter((item) => item.id !== action.payload);
     const dupeState = { ...state };
-    dupeState.data = newState;
     return dupeState;
+    dupeState.data = newState;
   }
   return state;
 };

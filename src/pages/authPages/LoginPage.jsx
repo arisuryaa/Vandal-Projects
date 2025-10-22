@@ -1,132 +1,81 @@
-import React, { useState } from "react";
-import { FaFacebook, FaGoogle } from "react-icons/fa";
+import React from "react";
+import { useForm } from "react-hook-form";
 import useDocumentTitle from "../../hook/useDocumentTitle";
+import { Link, useNavigate } from "react-router";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ToastContainer, toast } from "react-toastify";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../firebase";
 
 const LoginPage = () => {
-  useDocumentTitle("Vandal | Login Page");
-  const [email, setEmail] = useState();
-  const [password, setPassword] = useState();
+  const navigate = useNavigate();
+  const notify = (text) => {
+    toast(text);
+  };
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
+  useDocumentTitle("Vandal | Login");
+  const loginSchema = z.object({
+    email: z.string().email("email Tidak Valid").min(8),
+    password: z.string().min(5).max(15),
+  });
+
+  const {
+    handleSubmit,
+    register,
+    reset,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(loginSchema),
+  });
+
+  const handleFormSubmit = async ({ email, password }) => {
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const token = await userCredential.user.getIdToken();
-
-      console.log(token);
-      alert("ok");
+      const result = await signInWithEmailAndPassword(auth, email, password);
+      notify("Login Success");
+      console.log(result);
+      setTimeout(() => {
+        navigate("/");
+      }, 2000);
     } catch (error) {
-      alert("invalid");
+      notify(`${error.message}`);
       console.log(error);
     }
-    setEmail("");
-    setPassword("");
+    reset();
   };
 
   return (
-    <div className="min-h-screen  flex">
-      {/* Left Section - Form */}
-      <div className="w-full md:w-1/2 flex items-center justify-center px-8">
-        <div className="w-full max-w-md">
-          {/* Logo */}
-          <div className="text-center mb-8">{/* <div className="text-white text-xl font-semibold mb-2">Icon</div> */}</div>
-
-          {/* Title */}
-          <div className="text-center mb-8">
-            <h1 className="text-white text-2xl font-bold mb-2">Selamat Datang kembali</h1>
-            <p className="text-gray-300 text-sm">Masuk Dengan Akun Anda</p>
+    <>
+      <div className="flex min-h-screen gap-5">
+        <ToastContainer position="top-center" autoClose={1400} hideProgressBar={false} newestOnTop={false} closeOnClick={false} rtl={false} pauseOnFocusLoss draggable pauseOnHover theme="dark" />
+        <Link to={"/"} className="absolute right-20 top-8">
+          <img src="/public/logo.svg" className="" alt="" />
+        </Link>
+        <div className="w-[60%] h-screen">
+          <img src="/public/login.jpg" alt="" className="h-full" />
+        </div>
+        <div className="flex flex-col gap-4  justify-center  w-1/2 px-20">
+          <h1 className="text-3xl font-semibold">Login To Your Account</h1>
+          <div className="flex items-center gap-1 text-sm">
+            <p>Doesn't have account?</p>
+            <Link to={"/register"} className="underline">
+              Register
+            </Link>
           </div>
-
-          {/* Form */}
-          <form className="space-y-6" onSubmit={handleLogin}>
-            <div>
-              <label htmlFor="email" className="block text-white text-sm font-medium mb-2">
-                Email
-              </label>
-              <input
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                id="email"
-                type="email"
-                placeholder="Email"
-                className="w-full px-4 py-3 bg-transparent border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-              />
+          <form onSubmit={handleSubmit(handleFormSubmit)} className="flex flex-col gap-4">
+            <div className="flex flex-col">
+              <input type="email" className="w-full bg-slate-800 px-4 py-2 rounded-lg placeholder:text-sm" placeholder="Masukkan email" {...register("email")} required />
+              {errors.email && <p className="text-red-500">{errors.email.message}</p>}
             </div>
-
-            <div>
-              <label htmlFor="password" className="block text-white text-sm font-medium mb-2">
-                Password
-              </label>
-              <input
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                id="password"
-                type="password"
-                placeholder="Password"
-                className="w-full px-4 py-3 bg-transparent border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-              />
+            <div className="flex flex-col w-full">
+              <input type="password" className="w-full bg-slate-800 px-4 py-2 rounded-lg placeholder:text-sm" placeholder="Masukkan password" {...register("password")} required />
+              {errors.password && <p className="text-red-500">{errors.password.message}</p>}
             </div>
-
-            <div className="text-left">
-              <a href="#" className="text-gray-300 text-sm hover:text-white">
-                Lupa Kata Sandi?
-              </a>
-            </div>
-
-            <button type="submit" className="w-full bg-primary cursor-pointer hover:bg-green-600 text-white font-medium py-3 px-4 rounded-lg transition duration-200">
-              Masuk Akun
-            </button>
+            <button className="cursor-pointer bg-primary py-2 rounded-lg font-semibold">Submit</button>
           </form>
-
-          {/* Separator */}
-          <div className="flex items-center my-6">
-            <hr className="flex-1 border-gray-600" />
-            <span className="px-4 text-gray-400 text-sm">Atau</span>
-            <hr className="flex-1 border-gray-600" />
-          </div>
-
-          {/* Social Login */}
-          <div className="space-y-3">
-            <button className="w-full flex items-center justify-center gap-3 border border-gray-600 hover:border-gray-500 text-white py-3 px-4 rounded-lg transition duration-200">
-              <div className="rounded">
-                <FaFacebook />
-              </div>
-              <span>Facebook</span>
-              <span className="ml-auto">→</span>
-            </button>
-
-            <button className="w-full flex items-center justify-center gap-3 border border-gray-600 hover:border-gray-500 text-white py-3 px-4 rounded-lg transition duration-200">
-              <div className=" rounded">
-                <FaGoogle />
-              </div>
-              <span>Google</span>
-              <span className="ml-auto">→</span>
-            </button>
-          </div>
-
-          {/* Register Link */}
-          <div className="text-center mt-6">
-            <p className="text-gray-400 text-sm">
-              Belum Mempunyai Akun?{" "}
-              <a href="/register" className="text-green-500 hover:text-green-400">
-                Buat Akun
-              </a>
-            </p>
-          </div>
         </div>
       </div>
-
-      {/* Right Section - Image */}
-      <div className="hidden md:flex md:w-1/2 items-center justify-center p-8 h-[40rem] w-3/4">
-        <div className="text-center">
-          <div className="w-[45rem]  h-[42rem] rounded-lg flex items-center justify-center mb-4">
-            <img src="/login.jpg" alt="" className="w-full h-full" />
-          </div>
-        </div>
-      </div>
-    </div>
+    </>
   );
 };
 
