@@ -106,7 +106,7 @@ const Homepage = () => {
                         return (
                           <tr key={coin.id} className="hover:bg-gray-900 transition-all cursor-pointer">
                             <td>
-                              <button onClick={() => useAddToWatchlist(coin)}>
+                              <button onClick={() => useAddToWatchlist(coin.id)}>
                                 <CiStar className="text-xl text-white opacity-75 cursor-pointer" />
                               </button>
                             </td>

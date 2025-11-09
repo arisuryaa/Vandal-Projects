@@ -8,7 +8,7 @@ const Card = (props) => {
         <p className="text-sm text-white opacity-50">{props.description}</p>
       </div>
       <div className=" w-[35%] h-10">{props.chart}</div>
-    </div>
+    </div>  
   );
 };
 
