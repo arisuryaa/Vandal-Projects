@@ -68,7 +68,6 @@ const Navbar = () => {
             <Link className="text-sm" to={"/community"}>
               Community
             </Link>
-            <Link className="text-sm">Blog</Link>
           </div>
         </div>
 
