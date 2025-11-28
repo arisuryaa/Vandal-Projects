@@ -27,7 +27,7 @@ const DetailPage = () => {
       intersect: false,
     },
     plugins: {
-      legend: { display: false }, // CoinMarketCap tidak pakai legend
+      legend: { display: false },
       tooltip: {
         enabled: true,
         callbacks: {
@@ -93,7 +93,6 @@ const DetailPage = () => {
           ],
         },
       }));
-      // console.log(prices);
     } catch (error) {
       console.log(error);
     }
@@ -131,12 +130,13 @@ const DetailPage = () => {
       console.log(error);
     }
   };
+
   useEffect(() => {
     getDataDetail();
   }, [id]);
 
   useEffect(() => {
-    if (!dataCoin?.market_data) return; // guard biar ga error pas data masih kosong
+    if (!dataCoin?.market_data) return;
     const currentPrice = dataCoin.market_data.current_price?.usd;
     const priceChange24h = dataCoin.market_data.price_change_24h_in_currency?.usd;
     if (currentPrice && priceChange24h) {
@@ -148,142 +148,138 @@ const DetailPage = () => {
     getDataChart(id);
   }, [dataCoin]);
 
-  // console.log(dataCoin);
-
   return (
     <ProtectedRoute>
       <>
         <Navbar />
-        <div className="pt-32 px-10">
-          <div className="flex gap-2 h-fit border-b border-gray-400 mb-10">
-            <div className="w-[35%] flex flex-col gap-4 min-h-full border-r border-gray-400 pr-10 pb-10">
-              <div className="flex items-center gap-4 mb-4">
+        <div className="pt-32 px-4 sm:px-6 md:px-10">
+          <div className="flex flex-col lg:flex-row gap-4 lg:gap-2 h-fit border-b border-gray-400 mb-10">
+            {/* Left Sidebar - Full width on mobile, 35% on desktop */}
+            <div className="w-full lg:w-[35%] flex flex-col gap-4 min-h-full lg:border-r border-gray-400 lg:pr-10 pb-10">
+              {/* Breadcrumb */}
+              <div className="flex items-center gap-2 sm:gap-4 mb-4 text-sm sm:text-base overflow-x-auto">
                 <Link to={"/"}>{`Cryptocurrencies`}</Link>
                 <p>{`>`}</p>
-                <p className="capitalize text-primary font-semibold">{dataCoin.id} Price</p>
+                <p className="capitalize text-primary font-semibold whitespace-nowrap">{dataCoin.id} Price</p>
               </div>
-              <div className="flex items-center gap-2">
-                <img src={dataCoin?.image?.small} className="w-8 h-8" alt="" />
-                <h1 className="text-xl font-semibold capitalize">{dataCoin.id}</h1>
-                <h1 className="text-white uppercase opacity-70 text-sm">$ {dataCoin.symbol}</h1>
-                <span className="ml-3 py-1 px-1 text-xs rounded-sm bg-gray-400 text-white opacity-90"># {dataCoin?.market_cap_rank}</span>
+
+              {/* Coin Header */}
+              <div className="flex flex-wrap items-center gap-2">
+                <img src={dataCoin?.image?.small} className="w-6 h-6 sm:w-8 sm:h-8" alt="" />
+                <h1 className="text-lg sm:text-xl font-semibold capitalize">{dataCoin.id}</h1>
+                <h1 className="text-white uppercase opacity-70 text-xs sm:text-sm">$ {dataCoin.symbol}</h1>
+                <span className="ml-2 sm:ml-3 py-1 px-2 text-xs rounded-sm bg-gray-400 text-white opacity-90"># {dataCoin?.market_cap_rank}</span>
               </div>
-              <div className="flex items-center gap-3">
-                <h1 className="text-3xl font-bold">$ {dataCoin?.tickers?.[6]?.last.toLocaleString("en-US")}</h1>
-                <h2 className={percent > 0 ? `text-green-500 font-semibold` : `text-red-500`}> {`${percent}% (24h)`} </h2>
+
+              {/* Price Info */}
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                <h1 className="text-2xl sm:text-3xl font-bold">$ {dataCoin?.tickers?.[6]?.last.toLocaleString("en-US")}</h1>
+                <h2 className={percent > 0 ? `text-green-500 font-semibold text-sm sm:text-base` : `text-red-500 text-sm sm:text-base`}> {`${percent}% (24h)`} </h2>
               </div>
-              <div className="w-full flex gap-1">
-                <button type="submit" className="flex gap-3 justify-center items-center w-[85%] bg-primary  text-left px-4 py-2  rounded-lg shadow shadow-primary">
-                  <div className=" flex text-left items-center w-full justify-start">
+
+              {/* Action Buttons */}
+              <div className="w-full flex flex-col sm:flex-row gap-2 sm:gap-1">
+                <button type="submit" className="flex gap-3 justify-center items-center w-full sm:w-[85%] bg-primary text-left px-4 py-2 rounded-lg shadow shadow-primary">
+                  <div className="flex text-left items-center w-full justify-start">
                     <Link to={"/"} className="cursor-pointer">
                       <h1>Add to Portofolio</h1>
                     </Link>
                   </div>
                 </button>
-                <button type="submit" onClick={addToWatchlist} className="w-[15%] bg-primary flex justify-center items-center rounded-lg cursor-pointer">
-                  <CiStar className=" text-lg text-white opacity-75 cursor-pointer" />
+                <button type="submit" onClick={addToWatchlist} className="w-full sm:w-[15%] bg-primary flex justify-center items-center py-2 sm:py-0 rounded-lg cursor-pointer">
+                  <CiStar className="text-lg text-white opacity-75 cursor-pointer" />
                 </button>
               </div>
+
+              {/* Market Stats */}
               <div className="flex flex-col gap-2">
-                <div className="flex justify-between items-center px-1 py-3 border-b border-gray-500">
-                  <div className="flex items-center">
-                    <h1 className="capitalize opacity-80">Market Cap</h1>
-                  </div>
-                  <h1 className="font-semibold">$ {dataCoin?.market_data?.market_cap?.usd.toLocaleString("en-US")}</h1>
+                <div className="flex justify-between items-center px-1 py-3 border-b border-gray-500 text-sm">
+                  <h1 className="capitalize opacity-80">Market Cap</h1>
+                  <h1 className="font-semibold text-right">$ {dataCoin?.market_data?.market_cap?.usd.toLocaleString("en-US")}</h1>
                 </div>
-                <div className="flex justify-between items-center px-1 py-3 border-b border-gray-500">
-                  <div className="flex items-center">
-                    <h1 className="capitalize opacity-80">Fully Diluted Valuation</h1>
-                  </div>
-                  <h1 className="font-semibold">$ {dataCoin?.market_data?.fully_diluted_valuation?.usd.toLocaleString("en-US")}</h1>
+                <div className="flex justify-between items-center px-1 py-3 border-b border-gray-500 text-sm">
+                  <h1 className="capitalize opacity-80">Fully Diluted Valuation</h1>
+                  <h1 className="font-semibold text-right">$ {dataCoin?.market_data?.fully_diluted_valuation?.usd.toLocaleString("en-US")}</h1>
                 </div>
-                <div className="flex justify-between items-center px-1 py-3 border-b border-gray-500">
-                  <div className="flex items-center">
-                    <h1 className="capitalize opacity-80">24 Hour Trading Vol</h1>
-                  </div>
-                  <h1 className="font-semibold">$ {dataCoin?.market_data?.market_cap?.usd.toLocaleString("en-US")}</h1>
+                <div className="flex justify-between items-center px-1 py-3 border-b border-gray-500 text-sm">
+                  <h1 className="capitalize opacity-80">24 Hour Trading Vol</h1>
+                  <h1 className="font-semibold text-right">$ {dataCoin?.market_data?.market_cap?.usd.toLocaleString("en-US")}</h1>
                 </div>
-                <div className="flex justify-between items-center px-1 py-3 border-b border-gray-500">
-                  <div className="flex items-center">
-                    <h1 className="capitalize opacity-80">Circulating Supply </h1>
-                  </div>
-                  <h1 className="font-semibold">{dataCoin?.market_data?.circulating_supply.toLocaleString("en-US")}</h1>
+                <div className="flex justify-between items-center px-1 py-3 border-b border-gray-500 text-sm">
+                  <h1 className="capitalize opacity-80">Circulating Supply</h1>
+                  <h1 className="font-semibold text-right">{dataCoin?.market_data?.circulating_supply.toLocaleString("en-US")}</h1>
                 </div>
-                <div className="flex justify-between items-center px-1 py-3 border-b border-gray-500">
-                  <div className="flex items-center">
-                    <h1 className="capitalize opacity-80">Total Supply </h1>
-                  </div>
-                  <h1 className="font-semibold"> {dataCoin?.market_data?.total_supply.toLocaleString("en-US")}</h1>
+                <div className="flex justify-between items-center px-1 py-3 border-b border-gray-500 text-sm">
+                  <h1 className="capitalize opacity-80">Total Supply</h1>
+                  <h1 className="font-semibold text-right">{dataCoin?.market_data?.total_supply.toLocaleString("en-US")}</h1>
                 </div>
-                <div className="flex justify-between items-center px-1 py-3 border-b border-gray-500">
-                  <div className="flex items-center">
-                    <h1 className="capitalize opacity-80">Max Supply </h1>
-                  </div>
-                  <h1 className="font-semibold"> {dataCoin?.market_data?.max_supply == null ? "infinite" : dataCoin?.market_data?.max_supply?.toLocaleString("en-US")}</h1>
+                <div className="flex justify-between items-center px-1 py-3 border-b border-gray-500 text-sm">
+                  <h1 className="capitalize opacity-80">Max Supply</h1>
+                  <h1 className="font-semibold text-right">{dataCoin?.market_data?.max_supply == null ? "infinite" : dataCoin?.market_data?.max_supply?.toLocaleString("en-US")}</h1>
                 </div>
               </div>
+
+              {/* Info Links */}
               <div className="flex flex-col gap-1 mt-4">
-                <h1 className="text-xl font-bold">Info</h1>
-                <div className="flex justify-between items-center px-1 py-3 border-b border-gray-500">
-                  <div className="flex items-center">
-                    <h1 className="capitalize opacity-80">Website</h1>
-                  </div>
-                  <a className="font-semibold text-sm bg-gray-600 opacity-85 px-3 py-1 rounded-lg" href={dataCoin?.links?.homepage[0]} target="_blank">
+                <h1 className="text-lg sm:text-xl font-bold">Info</h1>
+                <div className="flex justify-between items-center px-1 py-3 border-b border-gray-500 text-sm">
+                  <h1 className="capitalize opacity-80">Website</h1>
+                  <a className="font-semibold text-xs bg-gray-600 opacity-85 px-3 py-1 rounded-lg truncate max-w-[60%]" href={dataCoin?.links?.homepage[0]} target="_blank">
                     {dataCoin?.links?.homepage[0]}
                   </a>
                 </div>
-                <div className="flex justify-between items-center px-1 py-3 border-b border-gray-500">
-                  <div className="flex items-center">
-                    <h1 className="capitalize opacity-80">Explorers</h1>
-                  </div>
-                  <a className="font-semibold text-sm bg-gray-600 opacity-85 px-3 py-1 rounded-lg" href={dataCoin?.links?.blockchain_site[0]} target="_blank">
+                <div className="flex justify-between items-center px-1 py-3 border-b border-gray-500 text-sm">
+                  <h1 className="capitalize opacity-80">Explorers</h1>
+                  <a className="font-semibold text-xs bg-gray-600 opacity-85 px-3 py-1 rounded-lg truncate max-w-[60%]" href={dataCoin?.links?.blockchain_site[0]} target="_blank">
                     {dataCoin?.links?.blockchain_site[0]}
                   </a>
                 </div>
-                <div className="flex justify-between items-center px-1 py-3 border-b border-gray-500">
-                  <div className="flex items-center">
-                    <h1 className="capitalize opacity-80">Community</h1>
-                  </div>
-                  <a className="font-semibold text-sm bg-gray-600 opacity-85 px-3 py-1 rounded-lg" href={dataCoin?.links?.twitter_screen_name} target="_blank">
+                <div className="flex justify-between items-center px-1 py-3 border-b border-gray-500 text-sm">
+                  <h1 className="capitalize opacity-80">Community</h1>
+                  <a className="font-semibold text-xs bg-gray-600 opacity-85 px-3 py-1 rounded-lg truncate max-w-[60%]" href={dataCoin?.links?.twitter_screen_name} target="_blank">
                     {dataCoin?.links?.twitter_screen_name}
                   </a>
                 </div>
-                <div className="flex justify-between items-center px-1 py-3 border-b border-gray-500">
-                  <div className="flex items-center">
-                    <h1 className="capitalize opacity-80">Source Code</h1>
-                  </div>
-                  <a className="font-semibold text-sm bg-gray-600 opacity-85 px-3 py-1 rounded-lg" href={dataCoin?.links?.repos_url?.github[0]} target="_blank">
+                <div className="flex justify-between items-center px-1 py-3 border-b border-gray-500 text-sm">
+                  <h1 className="capitalize opacity-80">Source Code</h1>
+                  <a className="font-semibold text-xs bg-gray-600 opacity-85 px-3 py-1 rounded-lg truncate max-w-[60%]" href={dataCoin?.links?.repos_url?.github[0]} target="_blank">
                     {dataCoin?.links?.repos_url?.github[0]}
                   </a>
                 </div>
               </div>
+
+              {/* Sentiment Market */}
               <div className="flex flex-col pt-4">
-                <h1 className="pb-4 font-semibold">Sentiment Market</h1>
-                <div className="flex items-center gap-4  w-full ">
-                  <span className="text-white">Bullish</span>
+                <h1 className="pb-4 font-semibold text-sm sm:text-base">Sentiment Market</h1>
+                <div className="flex items-center gap-2 sm:gap-4 w-full">
+                  <span className="text-white text-xs sm:text-sm whitespace-nowrap">Bullish</span>
                   <div className="flex-1 h-2 rounded-full overflow-hidden flex">
                     <div className="bg-green-500" style={{ width: `${dataCoin?.sentiment_votes_up_percentage}%` }}></div>
                     <div className="bg-red-500" style={{ width: `${dataCoin?.sentiment_votes_down_percentage}%` }}></div>
                   </div>
-                  <span className="text-white">Bearish</span>
+                  <span className="text-white text-xs sm:text-sm whitespace-nowrap">Bearish</span>
                 </div>
               </div>
             </div>
-            <div className="w-[70%] px-6 py-3">
+
+            {/* Right Content - Full width on mobile, 70% on desktop */}
+            <div className="w-full lg:w-[70%] px-0 lg:px-6 py-3">
               <div className="flex mb-6">
-                <h1 className="text-2xl font-bold">Chart Overview 7D</h1>
+                <h1 className="text-xl sm:text-2xl font-bold">Chart Overview 7D</h1>
               </div>
-              <div className="w-full ">
+              <div className="w-full h-64 sm:h-80 md:h-96">
                 <Line data={chartData[id] || { labels: [], datasets: [] }} options={options} />
               </div>
               <div className="mt-6 flex flex-col gap-2">
-                <h1 className="text-2xl font-semibold">What is {dataCoin.id}</h1>
-                <p className="leading-7 text-sm text-white opacity-80">{dataCoin?.description?.en}</p>
+                <h1 className="text-xl sm:text-2xl font-semibold">What is {dataCoin.id}</h1>
+                <p className="leading-6 sm:leading-7 text-xs sm:text-sm text-white opacity-80">{dataCoin?.description?.en}</p>
               </div>
             </div>
           </div>
-          <div className="mb-10 ">
-            <h1 className="text-3xl font-semibold capitalize">{dataCoin.id} News</h1>
+
+          {/* News Section */}
+          <div className="mb-10">
+            <h1 className="text-2xl sm:text-3xl font-semibold capitalize">{dataCoin.id} News</h1>
           </div>
         </div>
       </>

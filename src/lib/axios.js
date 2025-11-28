@@ -9,3 +9,7 @@ export const axiosInstance = axios.create({
 export const axiosServer = axios.create({
   baseURL: serverURL,
 });
+
+export const axiosLocal = axios.create({
+  baseURL: "http://localhost:3000/api",
+});

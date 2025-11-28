@@ -7,11 +7,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { auth } from "../../firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { toast, ToastContainer } from "react-toastify";
-import { axiosServer } from "../../lib/axios";
+import { axiosInstance, axiosLocal, axiosServer } from "../../lib/axios";
+import { FcGoogle } from "react-icons/fc";
+import { FaFacebookF } from "react-icons/fa";
+// import { Iodiamond } from "react-icons/io5";
 
-const LoginPage = () => {
+const RegisterPage = () => {
   const navigate = useNavigate();
-  useDocumentTitle("Vandal | Login");
+  useDocumentTitle("Vandal | Register");
   const notify = (text) => {
     toast(text);
   };
@@ -38,7 +41,19 @@ const LoginPage = () => {
       console.log(token);
       console.log(user);
 
-      await axiosServer.post(
+      // await axiosServer.post(
+      //   "/register",
+      //   {
+      //     email,
+      //     firebaseUid: user.uid,
+      //   },
+      //   {
+      //     headers: {
+      //       Authorization: `Bearer ${token}`,
+      //     },
+      //   }
+      // );
+      await axiosLocal.post(
         "/register",
         {
           email,
@@ -50,7 +65,6 @@ const LoginPage = () => {
           },
         }
       );
-
       notify("Register Success");
 
       console.log(result);
@@ -65,38 +79,122 @@ const LoginPage = () => {
   };
 
   return (
-    <>
-      <div className="flex min-h-screen gap-5">
-        <ToastContainer position="top-center" autoClose={1400} hideProgressBar={false} newestOnTop={false} closeOnClick={false} rtl={false} pauseOnFocusLoss draggable pauseOnHover theme="dark" />
-        <Link to={"/"} className="absolute right-20 top-8">
-          <img src="/public/logo.svg" className="" alt="" />
-        </Link>
-        <div className="w-[60%] h-screen">
-          <img src="/public/login.jpg" alt="" className="h-full" />
-        </div>
-        <div className="flex flex-col gap-4  justify-center  w-1/2 px-20">
-          <h1 className="text-3xl font-semibold">Register To Your Account</h1>
-          <div className="flex items-center gap-1 text-sm">
-            <p>Already Have an Account?</p>
-            <Link to={"/login"} className="underline">
-              Login
-            </Link>
+    <div className="min-h-screen flex">
+      <ToastContainer position="top-center" autoClose={1400} hideProgressBar={false} newestOnTop={false} closeOnClick={false} rtl={false} pauseOnFocusLoss draggable pauseOnHover theme="dark" />
+      {/* Left Side - Hero Section */}
+      <div className="hidden lg:flex lg:w-1/2 xl:w-[45%] p-8">
+        <div className="w-full h-full rounded-3xl bg-primary flex flex-col justify-between p-12 relative overflow-hidden">
+          {/* Decorative Elements */}
+          <div className="absolute top-8 right-8 flex gap-1">
+            <div className="w-1 h-16 bg-lime-600 opacity-30 rounded"></div>
+            <div className="w-1 h-16 bg-lime-600 opacity-30 rounded"></div>
+            <div className="w-1 h-16 bg-lime-600 opacity-30 rounded"></div>
           </div>
-          <form onSubmit={handleSubmit(handleFormSubmit)} className="flex flex-col gap-4">
-            <div className="flex flex-col">
-              <input type="email" className="w-full bg-slate-800 px-4 py-2 rounded-lg placeholder:text-sm" placeholder="Masukkan email" {...register("email")} required />
-              {errors.email && <p className="text-red-500">{errors.email.message}</p>}
-            </div>
-            <div className="flex flex-col w-full">
-              <input type="password" className="w-full bg-slate-800 px-4 py-2 rounded-lg placeholder:text-sm" placeholder="Masukkan password" {...register("password")} required />
-              {errors.password && <p className="text-red-500">{errors.password.message}</p>}
-            </div>
-            <button className="cursor-pointer bg-primary py-2 rounded-lg font-semibold">Submit</button>
-          </form>
+
+          {/* Decorative Dots Bottom Left */}
+          <div className="absolute bottom-8 left-8 grid grid-cols-5 gap-2">
+            {[...Array(15)].map((_, i) => (
+              <div key={i} className="w-2 h-2 rounded-full bg-lime-600 opacity-30"></div>
+            ))}
+          </div>
+
+          <div className="flex justify-center">
+            <img src="/public/element.png" alt="" />
+          </div>
+
+          {/* Bottom Text */}
+          <div className="text-center">
+            <h1 className="text-gray-800 text-3xl font-bold mb-3">Smarter Insights. Smarter Gains.</h1>
+            <p className="text-gray-700 text-xs leading-relaxed">
+              Every number matters. Get market insights, price updates, and trend
+              <br />
+              analytics that give you the advantage over everyone else.
+            </p>
+          </div>
         </div>
       </div>
-    </>
+
+      {/* Right Side - Form Section */}
+
+      <div className="w-full lg:w-1/2 xl:w-[55%] flex items-center justify-center p-6 lg:p-12">
+        <form onSubmit={handleSubmit(handleFormSubmit)}>
+          <div className="w-full max-w-md">
+            {/* Logo */}
+            <div className="flex justify-end mb-8 lg:absolute lg:top-8 lg:right-12">
+              <img src="/public/logo.svg" alt="" />
+            </div>
+
+            {/* Form Content */}
+            <div className="text-center mb-8 mt-10">
+              <h1 className="text-white text-3xl  font-bold mb-2">Sign up for an account</h1>
+              <p className="text-gray-400 text-sm">Send,spend and save smarter</p>
+            </div>
+
+            {/* Social Login Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 mb-4">
+              <button className="flex-1 flex items-center justify-center gap-3 px-2 bg-transparent border border-gray-600 rounded-xl hover:border-gray-400 transition-colors">
+                <FcGoogle className="text-xl" />
+                <span className="text-white text-sm">Sign up with google</span>
+              </button>
+              <button className="flex-1 flex items-center justify-center gap-3 px-2 py-3 bg-transparent border border-gray-600 rounded-xl hover:border-gray-400 transition-colors">
+                <div className="w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center">
+                  <FaFacebookF className="text-white text-xs" />
+                </div>
+                <span className="text-white text-sm">Sign up with Facebook</span>
+              </button>
+            </div>
+
+            {/* Divider */}
+            <div className="flex items-center gap-4 mb-4">
+              <div className="flex-1 h-px bg-gray-700"></div>
+              <span className="text-gray-500 text-sm">or with email</span>
+              <div className="flex-1 h-px bg-gray-700"></div>
+            </div>
+
+            {/* Input Fields */}
+            <div className="space-y-4">
+              <div>
+                <input
+                  type="email"
+                  placeholder="Enter Your Email"
+                  {...register("email")}
+                  className="w-full px-6 py-3 placeholder:text-sm text-sm bg-transparent border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-lime-400 transition-colors"
+                />
+              </div>
+
+              <div>
+                <input
+                  type="password"
+                  placeholder="Enter Your Password"
+                  {...register("password")}
+                  className="w-full px-6 py-3 placeholder:text-sm text-sm bg-transparent border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-lime-400 transition-colors"
+                />
+              </div>
+
+              {/* Terms */}
+              <p className="text-gray-400 text-sm leading-6 ">
+                By creating account, you agreeing to our <span className="text-white font-medium">Privacy Policy</span> and{" "}
+                <span className="text-white font-medium">Electronic Communication Policy</span>
+              </p>
+
+              {/* Submit Button */}
+              <button onClick={handleSubmit} className="w-full py-2 bg-lime-400 hover:bg-lime-500 text-gray-900 font-bold rounded-xl transition-colors">
+                Sign Up
+              </button>
+
+              {/* Sign In Link */}
+              <p className="text-center text-gray-400 text-sm">
+                Already have an account?{" "}
+                <Link to={"/login"} className="text-lime-400 hover:text-lime-300 font-medium cursor-pointer">
+                  Sign In
+                </Link>
+              </p>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
   );
 };
 
-export default LoginPage;
+export default RegisterPage;
