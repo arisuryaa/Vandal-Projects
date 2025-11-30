@@ -20,13 +20,14 @@ const Homepage = () => {
   useGetDataTrending();
   const dataTrending = useSelector((state) => state.dataTrending);
   const globalData = useSelector((state) => state.dataGlobal);
-  const { dataMarkets, loading, pagination, setPagination } = useGetDataMarket();
+  const { dataMarkets, isLoading, pagination, setPagination } = useGetDataMarket();
   const { chartData, options } = useGetDataChart();
 
   return (
     <ProtectedRoute>
       <>
         <Navbar />
+        {/* HAPUS Loading dari sini - sudah ditangani ProtectedRoute */}
         <div className="pt-32 px-4 sm:px-6 md:px-10 text-white">
           <div className="flex flex-col gap-2">
             <h1 className="text-white text-xl sm:text-2xl font-semibold">Cryptocurrencies Price by Market Cap </h1>
@@ -72,10 +73,14 @@ const Homepage = () => {
 
           {/* Responsive Table */}
           <div className="overflow-x-auto rounded-box bg-base-100">
-            {loading ? (
-              <p className="py-4 text-center">Loading...</p>
+            {isLoading ? (
+              <div className="py-20 text-center">
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                <p className="mt-4 text-gray-400">Loading market data...</p>
+              </div>
             ) : (
               <table className="table bg-backgroundBlack w-full min-w-[800px]">
+                {/* Table content tetap sama */}
                 <thead>
                   <tr className="text-xs">
                     <th className="hidden sm:table-cell"></th>
@@ -116,7 +121,6 @@ const Homepage = () => {
                             </td>
                             <Link className="contents" to={`/detail/${coin.id}`}>
                               <td>{index}</td>
-
                               <td>
                                 <div className="flex items-center gap-2 h-fit">
                                   <img src={coin.image} className="w-6 h-6 rounded-full" alt="" />
@@ -124,19 +128,13 @@ const Homepage = () => {
                                   <p className="text-xs text-white opacity-70 uppercase">{coin.symbol}</p>
                                 </div>
                               </td>
-
                               <td className="hidden lg:table-cell">
                                 <h1 className="text-primary border border-primary rounded-full py-1 px-2 text-center whitespace-nowrap">Buy</h1>
                               </td>
-
                               <td className="whitespace-nowrap">${coin.current_price.toLocaleString("en-US")}</td>
-
                               <td className={coin.price_change_percentage_24h > 0 ? `text-green-500` : `text-red-500`}>{Number(coin.price_change_percentage_24h).toFixed(1) + " %"}</td>
-
                               <td className="hidden md:table-cell whitespace-nowrap">$ {coin.total_volume.toLocaleString("en-US")}</td>
-
                               <td className="hidden lg:table-cell whitespace-nowrap">$ {coin.market_cap.toLocaleString("en-US")}</td>
-
                               <td className="hidden xl:table-cell">
                                 <div className="w-full h-[60px]">
                                   <Line data={chartData} options={{ plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } }} />

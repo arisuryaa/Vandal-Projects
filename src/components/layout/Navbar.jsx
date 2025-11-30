@@ -67,10 +67,10 @@ const Navbar = () => {
 
           {/* Desktop Navigation Links */}
           <div className="hidden lg:flex items-center gap-5">
-            <Link className="text-sm" to={"/"}>
+            <Link className="text-sm hover:text-primary hover:pb-1 hover:border-b-2 border-primary transition-all" to={"/"}>
               Homepage
             </Link>
-            <Link className="text-sm" to={"/community"}>
+            <Link className="text-sm hover:text-primary hover:pb-1 hover:border-b-2 border-primary transition-all" to={"/community"}>
               Community
             </Link>
           </div>
@@ -84,15 +84,15 @@ const Navbar = () => {
 
           <Link to={"/Portofolio"} className="flex items-center gap-2">
             <FaChartPie />
-            <h1>Portofolio</h1>
+            <h1 className="hover:text-primary hover:pb-1 hover:border-b-2 border-primary transition-all">Portofolio</h1>
           </Link>
           <Link className="flex items-center gap-2" to={"/watchlist"}>
             <FaStar />
-            <h1>Watchlist</h1>
+            <h1 className="hover:text-primary hover:pb-1 hover:border-b-2 border-primary transition-all">Watchlist</h1>
           </Link>
 
           {user ? (
-            <button onClick={handleLogout} className="cursor-pointer bg-primary px-8 py-2 rounded-md font-bold">
+            <button onClick={handleLogout} className=" hover:bg-green-950 transition-all cursor-pointer bg-primary px-8 py-2 rounded-md font-bold">
               Logout
             </button>
           ) : (

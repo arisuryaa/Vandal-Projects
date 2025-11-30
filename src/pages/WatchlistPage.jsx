@@ -7,6 +7,7 @@ import useDocumentTitle from "../hook/useDocumentTitle";
 import { CiStar } from "react-icons/ci";
 import { Link } from "react-router";
 import useAddToWatchlist from "../hook/useAddToWatchlist";
+import ProtectedRoute from "./ProtectedPages/ProtectPage";
 
 const WatchlistPage = () => {
   useDocumentTitle("Vandal | Watchlist Page");
@@ -65,96 +66,98 @@ const WatchlistPage = () => {
 
   return (
     <>
-      <Navbar />
-      <div className="px-10 mt-28">
-        <div className="flex flex-col gap-2">
-          <h1 className="text-2xl font-medium">Your Coin Watchlist</h1>
-          <p className="text-background">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sit, ipsum?</p>
-        </div>
+      <ProtectedRoute>
+        <Navbar />
+        <div className="px-10 mt-28">
+          <div className="flex flex-col gap-2">
+            <h1 className="text-2xl font-medium">Your Coin Watchlist</h1>
+            <p className="text-background">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sit, ipsum?</p>
+          </div>
 
-        {/* TABEL */}
-        <div className="overflow-x-auto rounded-box  bg-base-100">
-          {loading ? (
-            <p className="py-4 text-center ">Loading...</p>
-          ) : (
-            <table className="table bg-backgroundBlack overflow-x-hidden">
-              <thead>
-                <tr className="text-xs overflow-x-hidden">
-                  <th></th>
-                  <th>#</th>
-                  <th>Coin</th>
-                  <th></th>
-                  <th>Price</th>
-                  <th>24h</th>
-                  <th>24h Volume</th>
-                  <th>Market Cap</th>
-                  <th>Last 7 Day</th>
-                </tr>
-              </thead>
-              <tbody className="text-xs">
-                {watchlistCoin.length > 0
-                  ? watchlistCoin.map((coin, i) => {
-                      // const chartData = {
-                      //   labels: coin.sparkline_in_7d.price.map((_, idx) => idx),
-                      //   datasets: [
-                      //     {
-                      //       data: coin.sparkline_in_7d.price,
-                      //       borderColor: "red",
-                      //       fill: false,
-                      //       tension: 0.25,
-                      //       pointRadius: 0,
-                      //       borderWidth: 1.5,
-                      //     },
-                      //   ],
-                      // };
+          {/* TABEL */}
+          <div className="overflow-x-auto rounded-box  bg-base-100">
+            {loading ? (
+              <p className="py-4 text-center ">Loading...</p>
+            ) : (
+              <table className="table bg-backgroundBlack overflow-x-hidden">
+                <thead>
+                  <tr className="text-xs overflow-x-hidden">
+                    <th></th>
+                    <th>#</th>
+                    <th>Coin</th>
+                    <th></th>
+                    <th>Price</th>
+                    <th>24h</th>
+                    <th>24h Volume</th>
+                    <th>Market Cap</th>
+                    <th>Last 7 Day</th>
+                  </tr>
+                </thead>
+                <tbody className="text-xs">
+                  {watchlistCoin.length > 0
+                    ? watchlistCoin.map((coin, i) => {
+                        // const chartData = {
+                        //   labels: coin.sparkline_in_7d.price.map((_, idx) => idx),
+                        //   datasets: [
+                        //     {
+                        //       data: coin.sparkline_in_7d.price,
+                        //       borderColor: "red",
+                        //       fill: false,
+                        //       tension: 0.25,
+                        //       pointRadius: 0,
+                        //       borderWidth: 1.5,
+                        //     },
+                        //   ],
+                        // };
 
-                      return (
-                        <tr key={coin.id} className="hover:bg-gray-900 transition-all cursor-pointer">
-                          <td>
-                            <button onClick={() => useAddToWatchlist(coin.id)}>
-                              <CiStar className="text-xl text-white opacity-75 cursor-pointer" />
-                            </button>
-                          </td>
-                          <Link className="contents" to={`/detail/${coin.id}`}>
-                            <td>{i + 1}</td>
-
+                        return (
+                          <tr key={coin.id} className="hover:bg-gray-900 transition-all cursor-pointer">
                             <td>
-                              <div className="flex items-center gap-2 h-fit">
-                                <img src={coin.image.thumb} className="w-6 h-6 rounded-full" alt="" />
-                                <p className="capitalize">{coin.id}</p>
-                                <p className="text-xs text-white opacity-70 uppercase">{coin.symbol}</p>
-                              </div>
+                              <button onClick={() => useAddToWatchlist(coin.id)}>
+                                <CiStar className="text-xl text-white opacity-75 cursor-pointer" />
+                              </button>
                             </td>
+                            <Link className="contents" to={`/detail/${coin.id}`}>
+                              <td>{i + 1}</td>
 
-                            <td className="overflow-x-hidden">
-                              <h1 className="text-primary border border-primary rounded-full py-1 px-2 text-center">Buy</h1>
-                            </td>
+                              <td>
+                                <div className="flex items-center gap-2 h-fit">
+                                  <img src={coin.image.thumb} className="w-6 h-6 rounded-full" alt="" />
+                                  <p className="capitalize">{coin.id}</p>
+                                  <p className="text-xs text-white opacity-70 uppercase">{coin.symbol}</p>
+                                </div>
+                              </td>
 
-                            <td className="overflow-x-hidden">${coin.market_data.current_price.usd.toLocaleString("en-US")}</td>
+                              <td className="overflow-x-hidden">
+                                <h1 className="text-primary border border-primary rounded-full py-1 px-2 text-center">Buy</h1>
+                              </td>
 
-                            <td className={coin.market_data.price_change_percentage_24h_in_currency.usd > 0 ? "text-green-500" : "text-red-500"}>
-                              {coin.market_data.price_change_percentage_24h_in_currency.usd.toFixed(2) + " %"}
-                            </td>
+                              <td className="overflow-x-hidden">${coin.market_data.current_price.usd.toLocaleString("en-US")}</td>
 
-                            <td>$ {coin.market_data.total_volume.usd.toLocaleString("en-US")}</td>
+                              <td className={coin.market_data.price_change_percentage_24h_in_currency.usd > 0 ? "text-green-500" : "text-red-500"}>
+                                {coin.market_data.price_change_percentage_24h_in_currency.usd.toFixed(2) + " %"}
+                              </td>
 
-                            <td>$ {coin.market_data.market_cap.usd.toLocaleString("en-US")}</td>
+                              <td>$ {coin.market_data.total_volume.usd.toLocaleString("en-US")}</td>
 
-                            {/* <td>
+                              <td>$ {coin.market_data.market_cap.usd.toLocaleString("en-US")}</td>
+
+                              {/* <td>
                               <div className="w-full h-[60px]">
                                 <Line data={chartData} options={{ plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } }} />
                               </div>
                             </td> */}
-                          </Link>
-                        </tr>
-                      );
-                    })
-                  : null}
-              </tbody>
-            </table>
-          )}
+                            </Link>
+                          </tr>
+                        );
+                      })
+                    : null}
+                </tbody>
+              </table>
+            )}
+          </div>
         </div>
-      </div>
+      </ProtectedRoute>
     </>
   );
 };

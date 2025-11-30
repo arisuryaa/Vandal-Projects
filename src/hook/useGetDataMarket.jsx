@@ -4,7 +4,7 @@ const apiKey = import.meta.env.VITE_API_KEY;
 
 const useGetDataMarket = () => {
   const [dataMarkets, setDataMarkets] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setLoading] = useState(false);
   const [pagination, setPagination] = useState(1);
 
   useEffect(() => {
@@ -30,7 +30,7 @@ const useGetDataMarket = () => {
     getDataMarkets();
   }, [pagination]);
 
-  return { dataMarkets, setDataMarkets, loading, setLoading, pagination, setPagination };
+  return { dataMarkets, setDataMarkets, isLoading, setLoading, pagination, setPagination };
 };
 
 export default useGetDataMarket;
