@@ -1,5 +1,5 @@
 import React from "react";
-import { axiosServer } from "../lib/axios";
+import { axiosServer, axiosLocal } from "../lib/axios";
 import { getAuth } from "firebase/auth";
 // import { useDispatch } from "react-redux";
 
@@ -14,7 +14,7 @@ const useAddToWatchlist = async (coin) => {
   console.log(token);
 
   try {
-    const result = await axiosServer.post(
+    const result = await axiosLocal.post(
       "/watchlist",
       {
         coinId: coin,

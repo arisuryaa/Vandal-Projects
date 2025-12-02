@@ -1,7 +1,7 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { axiosServer, axiosInstance } from "../lib/axios";
+import { axiosServer, axiosInstance, axiosLocal } from "../lib/axios";
 import Navbar from "../components/layout/Navbar";
 import useDocumentTitle from "../hook/useDocumentTitle";
 import { CiStar } from "react-icons/ci";
@@ -19,7 +19,7 @@ const WatchlistPage = () => {
   const getDetailedWatchlist = async (user) => {
     try {
       const token = await user.getIdToken();
-      const { data } = await axiosServer.get("/watchlist", {
+      const { data } = await axiosLocal.get("/watchlist", {
         headers: { Authorization: `Bearer ${token}` },
       });
 

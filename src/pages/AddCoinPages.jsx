@@ -65,7 +65,7 @@ const AddCoinPages = () => {
       };
       console.log("Transaction Data:", transactionData);
 
-      const response = await axiosServer.post("/portofolio/transaction", transactionData, {
+      const response = await axiosLocal.post("/portofolio/transaction", transactionData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

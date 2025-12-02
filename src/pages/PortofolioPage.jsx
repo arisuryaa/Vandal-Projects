@@ -60,7 +60,7 @@ const PortofolioPage = () => {
   const getDataPortofolio = async (user) => {
     try {
       const token = await user.getIdToken();
-      const result = await axiosServer.get("/portofolio", {
+      const result = await axiosLocal.get("/portofolio", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -170,7 +170,7 @@ const PortofolioPage = () => {
       setDeletingId(coinId); // Set loading state untuk button ini
       const token = await userAuth.getIdToken();
 
-      await axiosServer.delete(`/portofolio/${coinId}`, {
+      await axiosLocal.delete(`/portofolio/${coinId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -207,7 +207,7 @@ const PortofolioPage = () => {
   const getDataTransaction = async (user) => {
     try {
       const token = await user.getIdToken();
-      const result = await axiosServer.get("/portofolio/allTransaction", {
+      const result = await axiosLocal.get("/portofolio/allTransaction", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -219,6 +219,41 @@ const PortofolioPage = () => {
       return [];
     }
   };
+
+  const handleDeleteTransaction = async (transactionId) => {
+    // Konfirmasi dengan user
+    const isConfirmed = window.confirm(`Are you sure you want to delete ${transactionId.toUpperCase()} from your portfolio? This action cannot be undone.`);
+
+    if (!isConfirmed) return;
+
+    try {
+      // setDeletingId(transactionId); // Set loading state untuk button ini
+      const token = await userAuth.getIdToken();
+
+      await axiosLocal.delete(`/portofolio/transaction/${transactionId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      // Refresh data portfolio setelah delete
+      const updatedPortfolio = await getDataPortofolio(userAuth);
+      await calculatePortfolioStats(updatedPortfolio);
+      await getDataTransaction();
+      await getDataTransaction(userAuth);
+
+      alert(`${transactionId.toUpperCase()} successfully deleted from portfolio!`);
+    } catch (error) {
+      console.error("Error deleting coin:", error);
+      alert(`Failed to delete ${transactionId.toUpperCase()}. Please try again.`);
+    } finally {
+      setDeletingId(null); // Reset loading state
+    }
+  };
+
+  useEffect(() => {
+    console.log(resultAllTransaction);
+  }, [allTransaction]);
 
   useEffect(() => {
     getDataGlobal();
@@ -367,7 +402,7 @@ const PortofolioPage = () => {
                             </td>
                             <td className="hidden lg:table-cell max-w-[200px] truncate text-gray-400">{transaction.note || "-"}</td>
                             <td className="  text-gray-400">
-                              <DropdownMenu coinId={transaction.id} isEdit={true} onDelete={() => alert("ok")} isDeleting={() => alert("ok")}></DropdownMenu>
+                              <DropdownMenu coinId={transaction._id} isEdit={true} isAddMore={false} onDelete={() => handleDeleteTransaction(transaction._id)}></DropdownMenu>
                             </td>
                           </tr>
                         ))
@@ -428,7 +463,7 @@ const PortofolioPage = () => {
                               <td className="hidden xl:table-cell whitespace-nowrap">{formatCurrency(coin.totalSpend)}</td>
                             </Link>
                             <td className="hidden xl:table-cell">
-                              <DropdownMenu coinId={coin.coinId} isEdit={false} onDelete={() => handleDeleteCoin(coin.coinId)} isDeleting={deletingId === coin.coinId} />
+                              <DropdownMenu isAddMore={true} coinId={coin.coinId} isEdit={false} onDelete={() => handleDeleteCoin(coin.coinId)} isDeleting={deletingId === coin.coinId} />
                             </td>
                           </tr>
                         ))

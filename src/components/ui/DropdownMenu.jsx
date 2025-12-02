@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { Link, useNavigate } from "react-router";
 
 // Mini Dropdown Menu Component
-const DropdownMenu = ({ coinId, isEdit, onDelete, isDeleting }) => {
+const DropdownMenu = ({ coinId, isEdit, onDelete, isAddMore, isDeleting }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
@@ -49,7 +49,7 @@ const DropdownMenu = ({ coinId, isEdit, onDelete, isDeleting }) => {
       {isOpen && (
         <div className="absolute right-12 -top-20 mt-2 w-40 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-[999] overflow-hidden">
           <div className="py-1">
-            {coinId ? (
+            {coinId && isAddMore ? (
               <button
                 onClick={(e) => {
                   e.preventDefault();
