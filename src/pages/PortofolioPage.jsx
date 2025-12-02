@@ -9,6 +9,7 @@ import { axiosInstance, axiosLocal } from "../lib/axios";
 import { Link, useNavigate } from "react-router";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import ProtectedRoute from "./ProtectedPages/ProtectPage";
+import DropdownMenu from "../components/ui/DropdownMenu";
 
 const PortofolioPage = () => {
   const navigate = useNavigate();
@@ -178,6 +179,7 @@ const PortofolioPage = () => {
       // Refresh data portfolio setelah delete
       const updatedPortfolio = await getDataPortofolio(userAuth);
       await calculatePortfolioStats(updatedPortfolio);
+      await getDataTransaction(userAuth);
 
       alert(`${coinId.toUpperCase()} successfully deleted from portfolio!`);
     } catch (error) {
@@ -210,6 +212,7 @@ const PortofolioPage = () => {
           Authorization: `Bearer ${token}`,
         },
       });
+      setResultAllTransaction(result.data.portfolioData.result);
       return result.data.portfolioData.result || [];
     } catch (error) {
       console.log(error);
@@ -327,6 +330,7 @@ const PortofolioPage = () => {
                         <th className="hidden sm:table-cell">Total Value</th>
                         <th className="hidden md:table-cell">Date</th>
                         <th className="hidden lg:table-cell">Note</th>
+                        <th className="hidden lg:table-cell">action</th>
                       </tr>
                     </thead>
                     <tbody className="text-xs">
@@ -362,6 +366,9 @@ const PortofolioPage = () => {
                               })}
                             </td>
                             <td className="hidden lg:table-cell max-w-[200px] truncate text-gray-400">{transaction.note || "-"}</td>
+                            <td className="  text-gray-400">
+                              <DropdownMenu coinId={transaction.id} isEdit={true} onDelete={() => alert("ok")} isDeleting={() => alert("ok")}></DropdownMenu>
+                            </td>
                           </tr>
                         ))
                       ) : (
@@ -421,18 +428,7 @@ const PortofolioPage = () => {
                               <td className="hidden xl:table-cell whitespace-nowrap">{formatCurrency(coin.totalSpend)}</td>
                             </Link>
                             <td className="hidden xl:table-cell">
-                              <div className="flex gap-2">
-                                <button onClick={() => navigate(`/addcoin/${coin.coinId}`)} className="bg-blue-400 px-3 py-1 cursor-pointer rounded-md text-xs hover:bg-blue-500 transition-all">
-                                  Add More
-                                </button>
-                                <button
-                                  onClick={() => handleDeleteCoin(coin.coinId)}
-                                  disabled={deletingId === coin.coinId}
-                                  className="bg-red-400 px-3 py-1 cursor-pointer rounded-md text-xs hover:bg-red-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                  {deletingId === coin.coinId ? "Deleting..." : "Delete"}
-                                </button>
-                              </div>
+                              <DropdownMenu coinId={coin.coinId} isEdit={false} onDelete={() => handleDeleteCoin(coin.coinId)} isDeleting={deletingId === coin.coinId} />
                             </td>
                           </tr>
                         ))

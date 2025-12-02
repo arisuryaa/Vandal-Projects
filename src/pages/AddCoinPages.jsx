@@ -3,9 +3,10 @@ import { useForm } from "react-hook-form";
 import Navbar from "../components/layout/Navbar";
 import { useNavigate, useParams } from "react-router";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { axiosLocal, axiosServer } from "../lib/axios";
+import { axiosInstance, axiosLocal, axiosServer } from "../lib/axios";
 import { FaArrowUp, FaArrowDown, FaCalendar, FaCoins, FaDollarSign, FaStickyNote } from "react-icons/fa";
 import ProtectedRoute from "./ProtectedPages/ProtectPage";
+const apiKey = import.meta.env.VITE_API_KEY;
 
 const AddCoinPages = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -13,11 +14,13 @@ const AddCoinPages = () => {
   const { id } = useParams();
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState();
+  const [dataCoin, setDataCoin] = useState([]);
 
   const {
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -30,6 +33,21 @@ const AddCoinPages = () => {
   const pricePerCoin = watch("pricePerCoin");
   const type = watch("type");
   const totalValue = quantity && pricePerCoin ? (quantity * pricePerCoin).toFixed(2) : "0.00";
+
+  const getDataDetail = async () => {
+    try {
+      const response = await axiosInstance.get(`/coins/${id}`, {
+        params: {
+          vs_currency: "usd",
+          x_cg_demo_api_key: apiKey,
+          sparkline: true,
+        },
+      });
+      setDataCoin(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const onSubmit = async (data) => {
     try {
@@ -78,6 +96,17 @@ const AddCoinPages = () => {
 
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    getDataDetail();
+  }, []);
+
+  useEffect(() => {
+    if (dataCoin?.tickers?.[0]?.last) {
+      setValue("pricePerCoin", dataCoin.tickers[0].last);
+    }
+    console.log(dataCoin);
+  }, [dataCoin, setValue]);
 
   return (
     <ProtectedRoute>
