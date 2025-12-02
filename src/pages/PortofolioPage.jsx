@@ -5,7 +5,7 @@ import useDocumentTitle from "../hook/useDocumentTitle";
 import OpenNavbar from "../components/layout/OpenNavbar";
 import { useDebounce } from "use-debounce";
 import { useSelector, useDispatch } from "react-redux";
-import { axiosInstance, axiosLocal } from "../lib/axios";
+import { axiosInstance, axiosLocal, axiosServer } from "../lib/axios";
 import { Link, useNavigate } from "react-router";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import ProtectedRoute from "./ProtectedPages/ProtectPage";
@@ -60,7 +60,7 @@ const PortofolioPage = () => {
   const getDataPortofolio = async (user) => {
     try {
       const token = await user.getIdToken();
-      const result = await axiosLocal.get("/portofolio", {
+      const result = await axiosServer.get("/portofolio", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -170,7 +170,7 @@ const PortofolioPage = () => {
       setDeletingId(coinId); // Set loading state untuk button ini
       const token = await userAuth.getIdToken();
 
-      await axiosLocal.delete(`/portofolio/${coinId}`, {
+      await axiosServer.delete(`/portofolio/${coinId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -207,7 +207,7 @@ const PortofolioPage = () => {
   const getDataTransaction = async (user) => {
     try {
       const token = await user.getIdToken();
-      const result = await axiosLocal.get("/portofolio/allTransaction", {
+      const result = await axiosServer.get("/portofolio/allTransaction", {
         headers: {
           Authorization: `Bearer ${token}`,
         },

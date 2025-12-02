@@ -67,7 +67,7 @@ const LoginPage = () => {
           </div>
 
           <div className="flex justify-center">
-            <img src="/public/element.png" alt="" />
+            <img src="/element.png" alt="" />
           </div>
 
           {/* Bottom Text */}

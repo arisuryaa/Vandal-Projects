@@ -53,7 +53,7 @@ const RegisterPage = () => {
       //     },
       //   }
       // );
-      await axiosLocal.post(
+      await axiosServer.post(
         "/register",
         {
           email,
@@ -99,7 +99,7 @@ const RegisterPage = () => {
           </div>
 
           <div className="flex justify-center">
-            <img src="/public/element.png" alt="" />
+            <img src="/element.png" alt="" />
           </div>
 
           {/* Bottom Text */}
