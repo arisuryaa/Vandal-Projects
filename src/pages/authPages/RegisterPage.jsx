@@ -121,7 +121,7 @@ const RegisterPage = () => {
           <div className="w-full max-w-md">
             {/* Logo */}
             <div className="flex justify-end mb-8 lg:absolute lg:top-8 lg:right-12">
-              <img src="/public/logo.svg" alt="" />
+              <img src="/logo.svg" alt="" />
             </div>
 
             {/* Form Content */}
@@ -132,7 +132,7 @@ const RegisterPage = () => {
 
             {/* Social Login Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 mb-4">
-              <button className="flex-1 flex items-center justify-center gap-3 px-2 bg-transparent border border-gray-600 rounded-xl hover:border-gray-400 transition-colors">
+              <button className="flex-1 flex items-center justify-center gap-3 px-2 py-3 bg-transparent border border-gray-600 rounded-xl hover:border-gray-400 transition-colors">
                 <FcGoogle className="text-xl" />
                 <span className="text-white text-sm">Sign up with google</span>
               </button>

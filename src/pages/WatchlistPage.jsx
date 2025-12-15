@@ -68,7 +68,7 @@ const WatchlistPage = () => {
     <>
       <ProtectedRoute>
         <Navbar />
-        <div className="px-10 mt-28">
+        <div className="px-10 mt-28 mb-20">
           <div className="flex flex-col gap-2">
             <h1 className="text-2xl font-medium">Your Coin Watchlist</h1>
             <p className="text-background">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sit, ipsum?</p>
@@ -79,7 +79,7 @@ const WatchlistPage = () => {
             {loading ? (
               <p className="py-4 text-center ">Loading...</p>
             ) : (
-              <table className="table bg-backgroundBlack overflow-x-hidden">
+              <table className="table bg-backgroundBlack overflow-x-hidden mt-10">
                 <thead>
                   <tr className="text-xs overflow-x-hidden">
                     <th></th>

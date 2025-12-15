@@ -178,16 +178,21 @@ const DetailPage = () => {
               </div>
 
               {/* Action Buttons */}
-              <div className="w-full flex flex-col sm:flex-row gap-2 sm:gap-1">
-                <button type="submit" className="flex gap-3 justify-center items-center w-full sm:w-[85%] bg-primary text-left px-4 py-2 rounded-lg shadow shadow-primary">
-                  <div className="flex text-left items-center w-full justify-start">
-                    <Link to={"/"} className="cursor-pointer">
-                      <h1>Add to Portofolio</h1>
-                    </Link>
-                  </div>
-                </button>
-                <button type="submit" onClick={addToWatchlist} className="w-full sm:w-[15%] bg-primary flex justify-center items-center py-2 sm:py-0 rounded-lg cursor-pointer">
-                  <CiStar className="text-lg text-white opacity-75 cursor-pointer" />
+              <div className="w-full flex sm:flex-row gap-2 sm:gap-1">
+                <Link to={"/addCoin"} className="cursor-pointer w-[85%]">
+                  <button
+                    type="submit"
+                    className="flex gap-3 justify-center items-center w-full cursor-pointer text-black  bg-primary hover:bg-yellow-500 transition-all text-left px-4 py-2 rounded-lg font-semibold"
+                  >
+                    Add To Portofolio
+                  </button>
+                </Link>
+                <button
+                  type="submit"
+                  onClick={addToWatchlist}
+                  className=" hover:bg-yellow-400 transition-all bg-primary w-full sm:w-[15%] text-black flex justify-center items-center py-2 sm:py-0 rounded-lg cursor-pointer"
+                >
+                  <CiStar className="text-lg font-semibold text-black opacity-75 cursor-pointer" />
                 </button>
               </div>
 

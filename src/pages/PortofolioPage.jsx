@@ -10,6 +10,7 @@ import { Link, useNavigate } from "react-router";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import ProtectedRoute from "./ProtectedPages/ProtectPage";
 import DropdownMenu from "../components/ui/DropdownMenu";
+import { ToastContainer } from "react-toastify";
 
 const PortofolioPage = () => {
   const navigate = useNavigate();
@@ -292,6 +293,7 @@ const PortofolioPage = () => {
     <ProtectedRoute>
       <>
         {inputActive && <OpenNavbar mode="add" text={text} setText={setText} resultSearch={resultSearch} dataTrending={dataTrending} setInputActive={setInputActive} onAddCoin={handleAddCoin} />}
+        <ToastContainer position="top-center" autoClose={false} hideProgressBar={false} newestOnTop={false} closeOnClick={false} rtl={false} pauseOnFocusLoss draggable pauseOnHover theme="dark" />
 
         <Navbar />
 
