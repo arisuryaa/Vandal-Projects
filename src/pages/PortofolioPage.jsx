@@ -61,7 +61,7 @@ const PortofolioPage = () => {
   const getDataPortofolio = async (user) => {
     try {
       const token = await user.getIdToken();
-      const result = await axiosLocal.get("/portofolio", {
+      const result = await axiosServer.get("/portofolio", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -171,7 +171,7 @@ const PortofolioPage = () => {
       setDeletingId(coinId); // Set loading state untuk button ini
       const token = await userAuth.getIdToken();
 
-      await axiosLocal.delete(`/portofolio/${coinId}`, {
+      await axiosServer.delete(`/portofolio/${coinId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -208,7 +208,7 @@ const PortofolioPage = () => {
   const getDataTransaction = async (user) => {
     try {
       const token = await user.getIdToken();
-      const result = await axiosLocal.get("/portofolio/allTransaction", {
+      const result = await axiosServer.get("/portofolio/allTransaction", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -231,7 +231,7 @@ const PortofolioPage = () => {
       // setDeletingId(transactionId); // Set loading state untuk button ini
       const token = await userAuth.getIdToken();
 
-      await axiosLocal.delete(`/portofolio/transaction/${transactionId}`, {
+      await axiosServer.delete(`/portofolio/transaction/${transactionId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

@@ -14,7 +14,7 @@ const useAddToWatchlist = async (coin) => {
   console.log(token);
 
   try {
-    const result = await axiosLocal.post(
+    const result = await axiosInstance.post(
       "/watchlist",
       {
         coinId: coin,

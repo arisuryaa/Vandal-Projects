@@ -19,7 +19,7 @@ const WatchlistPage = () => {
   const getDetailedWatchlist = async (user) => {
     try {
       const token = await user.getIdToken();
-      const { data } = await axiosLocal.get("/watchlist", {
+      const { data } = await axiosServer.get("/watchlist", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
