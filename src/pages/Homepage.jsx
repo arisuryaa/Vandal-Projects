@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import { Link } from "react-router";
 import { Line } from "react-chartjs-2";
 import { CiStar } from "react-icons/ci";
+import { FaStar } from "react-icons/fa";
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from "chart.js";
 import Navbar from "../components/layout/Navbar";
 import useDocumentTitle from "../hook/useDocumentTitle";
