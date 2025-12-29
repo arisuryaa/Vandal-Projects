@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Card from "../components/ui/Card";
 import CardList from "../components/ui/CardList";
 import { useSelector } from "react-redux";
@@ -11,7 +11,7 @@ import useDocumentTitle from "../hook/useDocumentTitle";
 import { useGetDataTrending } from "../hook/useGetDataTrending";
 import useGetDataMarket from "../hook/useGetDataMarket";
 import useGetDataChart from "../hook/useGetDataChart";
-import useAddToWatchlist from "../hook/useAddToWatchlist";
+import useWatchlist from "../hook/useWatchlist"; // ✅ Ganti import
 import ProtectedRoute from "./ProtectedPages/ProtectPage";
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -22,6 +22,13 @@ const Homepage = () => {
   const globalData = useSelector((state) => state.dataGlobal);
   const { dataMarkets, isLoading, pagination, setPagination } = useGetDataMarket();
   const { chartData, options } = useGetDataChart();
+
+  const { watchlist, loading: watchlistLoading, addToWatchlist, removeFromWatchlist, isInWatchlist, fetchWatchlist } = useWatchlist();
+
+  // ✅ Fix useEffect dengan dependency yang benar
+  useEffect(() => {
+    fetchWatchlist();
+  }, [fetchWatchlist]);
 
   return (
     <ProtectedRoute>
@@ -115,8 +122,24 @@ const Homepage = () => {
                         return (
                           <tr key={coin.id} className="hover:bg-gray-900 transition-all cursor-pointer">
                             <td className="hidden sm:table-cell">
-                              <button onClick={() => useAddToWatchlist(coin.id)}>
-                                <CiStar className="text-xl text-white opacity-75 cursor-pointer" />
+                              <button
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation(); // ✅ Tambahkan ini juga
+                                  if (isInWatchlist(coin.id)) {
+                                    removeFromWatchlist(coin.id);
+                                  } else {
+                                    addToWatchlist(coin.id);
+                                  }
+                                }}
+                                disabled={watchlistLoading} // ✅ Disable saat loading
+                                className="hover:scale-110 transition-transform disabled:opacity-50"
+                              >
+                                {isInWatchlist(coin.id) ? (
+                                  <FaStar className="text-xl text-yellow-400 cursor-pointer" />
+                                ) : (
+                                  <CiStar className="text-xl text-white opacity-75 cursor-pointer hover:opacity-100" />
+                                )}
                               </button>
                             </td>
                             <Link className="contents" to={`/detail/${coin.id}`}>

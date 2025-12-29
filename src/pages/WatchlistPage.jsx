@@ -1,33 +1,46 @@
-import React from "react";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { axiosServer, axiosInstance, axiosLocal } from "../lib/axios";
+import { axiosLocal } from "../lib/axios";
 import Navbar from "../components/layout/Navbar";
 import useDocumentTitle from "../hook/useDocumentTitle";
 import { CiStar } from "react-icons/ci";
+import { FaStar } from "react-icons/fa";
 import { Link } from "react-router";
-import useAddToWatchlist from "../hook/useAddToWatchlist";
+import useWatchlist from "../hook/useWatchlist";
 import ProtectedRoute from "./ProtectedPages/ProtectPage";
 
 const WatchlistPage = () => {
   useDocumentTitle("Vandal | Watchlist Page");
 
+  const { watchlist, removeFromWatchlist, isInWatchlist, fetchWatchlist } = useWatchlist();
+
   const [watchlistCoin, setWatchlistCoins] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [noWatchlistCoin, setNoWatchlistCoin] = useState(false);
+  const [error, setError] = useState(null);
 
   const getDetailedWatchlist = async (user) => {
     try {
+      setLoading(true);
+      setError(null);
+
       const token = await user.getIdToken();
-      const { data } = await axiosServer.get("/watchlist", {
+      const { data } = await axiosLocal.get("/watchlist", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      console.log(data);
-      return data.data;
+      console.log("✅ Watchlist response:", data);
+
+      if (data.data && data.data.length > 0) {
+        setWatchlistCoins(data.data);
+      } else {
+        setWatchlistCoins([]);
+      }
     } catch (error) {
-      console.error("Error getting detailed watchlist:", error);
-      return [];
+      console.error("❌ Error getting watchlist:", error);
+      setError("Failed to load watchlist. Please try again.");
+      setWatchlistCoins([]);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -36,129 +49,189 @@ const WatchlistPage = () => {
 
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        // user sudah login → baru ambil data
-        setLoading(true);
-        const result = await getDetailedWatchlist(user);
-
-        if (result.length === 0) {
-          setNoWatchlistCoin(true);
-        } else {
-          setWatchlistCoins(result);
-          setNoWatchlistCoin(false);
-          console.log(result);
-        }
-        setLoading(false);
+        await fetchWatchlist();
+        await getDetailedWatchlist(user);
       } else {
-        // belum login → tampilkan pesan
-        setNoWatchlistCoin(true);
         setLoading(false);
       }
     });
 
-    return () => unsubscribe(); // cleanup listener saat unmount
-  }, []);
+    return () => unsubscribe();
+  }, [fetchWatchlist]);
 
-  useEffect(() => {
-    console.log(watchlistCoin);
-  }, [watchlistCoin]);
+  const handleRemoveFromWatchlist = async (coinId) => {
+    await removeFromWatchlist(coinId);
 
-  if (noWatchlistCoin) return <p>No coins in watchlist.</p>;
+    const auth = getAuth();
+    const user = auth.currentUser;
+    if (user) {
+      await getDetailedWatchlist(user);
+    }
+  };
 
-  return (
-    <>
+  if (loading) {
+    return (
       <ProtectedRoute>
         <Navbar />
-        <div className="px-10 mt-28 mb-20">
-          <div className="flex flex-col gap-2">
-            <h1 className="text-2xl font-medium">Your Coin Watchlist</h1>
-            <p className="text-background">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sit, ipsum?</p>
-          </div>
-
-          {/* TABEL */}
-          <div className="overflow-x-auto rounded-box  bg-base-100">
-            {loading ? (
-              <p className="py-4 text-center ">Loading...</p>
-            ) : (
-              <table className="table bg-backgroundBlack overflow-x-hidden mt-10">
-                <thead>
-                  <tr className="text-xs overflow-x-hidden">
-                    <th></th>
-                    <th>#</th>
-                    <th>Coin</th>
-                    <th></th>
-                    <th>Price</th>
-                    <th>24h</th>
-                    <th>24h Volume</th>
-                    <th>Market Cap</th>
-                    <th>Last 7 Day</th>
-                  </tr>
-                </thead>
-                <tbody className="text-xs">
-                  {watchlistCoin.length > 0
-                    ? watchlistCoin.map((coin, i) => {
-                        // const chartData = {
-                        //   labels: coin.sparkline_in_7d.price.map((_, idx) => idx),
-                        //   datasets: [
-                        //     {
-                        //       data: coin.sparkline_in_7d.price,
-                        //       borderColor: "red",
-                        //       fill: false,
-                        //       tension: 0.25,
-                        //       pointRadius: 0,
-                        //       borderWidth: 1.5,
-                        //     },
-                        //   ],
-                        // };
-
-                        return (
-                          <tr key={coin.id} className="hover:bg-gray-900 transition-all cursor-pointer">
-                            <td>
-                              <button onClick={() => useAddToWatchlist(coin.id)}>
-                                <CiStar className="text-xl text-white opacity-75 cursor-pointer" />
-                              </button>
-                            </td>
-                            <Link className="contents" to={`/detail/${coin.id}`}>
-                              <td>{i + 1}</td>
-
-                              <td>
-                                <div className="flex items-center gap-2 h-fit">
-                                  <img src={coin.image.thumb} className="w-6 h-6 rounded-full" alt="" />
-                                  <p className="capitalize">{coin.id}</p>
-                                  <p className="text-xs text-white opacity-70 uppercase">{coin.symbol}</p>
-                                </div>
-                              </td>
-
-                              <td className="overflow-x-hidden">
-                                <h1 className="text-primary border border-primary rounded-full py-1 px-2 text-center">Buy</h1>
-                              </td>
-
-                              <td className="overflow-x-hidden">${coin.market_data.current_price.usd.toLocaleString("en-US")}</td>
-
-                              <td className={coin.market_data.price_change_percentage_24h_in_currency.usd > 0 ? "text-green-500" : "text-red-500"}>
-                                {coin.market_data.price_change_percentage_24h_in_currency.usd.toFixed(2) + " %"}
-                              </td>
-
-                              <td>$ {coin.market_data.total_volume.usd.toLocaleString("en-US")}</td>
-
-                              <td>$ {coin.market_data.market_cap.usd.toLocaleString("en-US")}</td>
-
-                              {/* <td>
-                              <div className="w-full h-[60px]">
-                                <Line data={chartData} options={{ plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } }} />
-                              </div>
-                            </td> */}
-                            </Link>
-                          </tr>
-                        );
-                      })
-                    : null}
-                </tbody>
-              </table>
-            )}
+        <div className="px-4 sm:px-6 md:px-10 mt-28 mb-20">
+          <div className="flex flex-col items-center justify-center py-20">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+            <p className="text-gray-400">Loading your watchlist...</p>
           </div>
         </div>
       </ProtectedRoute>
-    </>
+    );
+  }
+
+  if (error) {
+    return (
+      <ProtectedRoute>
+        <Navbar />
+        <div className="px-4 sm:px-6 md:px-10 mt-28 mb-20">
+          <div className="flex flex-col items-center justify-center py-20">
+            <p className="text-red-500 mb-4">{error}</p>
+            <button
+              onClick={() => {
+                const auth = getAuth();
+                const user = auth.currentUser;
+                if (user) getDetailedWatchlist(user);
+              }}
+              className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/80"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+      </ProtectedRoute>
+    );
+  }
+
+  if (watchlistCoin.length === 0) {
+    return (
+      <ProtectedRoute>
+        <Navbar />
+        <div className="px-4 sm:px-6 md:px-10 mt-28 mb-20">
+          <div className="flex flex-col gap-2 mb-8">
+            <h1 className="text-xl sm:text-2xl font-medium text-white">Your Coin Watchlist</h1>
+            <p className="text-gray-400 text-sm sm:text-base">Track your favorite cryptocurrencies in one place</p>
+          </div>
+
+          <div className="flex flex-col items-center justify-center py-20 bg-backgroundBlack rounded-lg">
+            <CiStar className="text-6xl text-gray-600 mb-4" />
+            <h2 className="text-xl text-white mb-2">No coins in watchlist</h2>
+            <p className="text-gray-400 mb-6 text-center max-w-md">Start building your watchlist by clicking the star icon on any coin from the homepage</p>
+            <Link to="/" className="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/80 transition-colors">
+              Browse Coins
+            </Link>
+          </div>
+        </div>
+      </ProtectedRoute>
+    );
+  }
+
+  return (
+    <ProtectedRoute>
+      <Navbar />
+      <div className="px-4 sm:px-6 md:px-10 mt-28 mb-20">
+        {/* Header */}
+        <div className="flex flex-col gap-2 mb-8">
+          <div className="flex items-center justify-between">
+            <h1 className="text-xl sm:text-2xl font-medium text-white">Your Coin Watchlist</h1>
+            <span className="text-sm text-gray-400">
+              {watchlistCoin.length} {watchlistCoin.length === 1 ? "coin" : "coins"}
+            </span>
+          </div>
+          <p className="text-gray-400 text-sm sm:text-base">Track your favorite cryptocurrencies and their performance</p>
+        </div>
+
+        {/* Table */}
+        <div className="overflow-x-auto rounded-lg bg-base-100">
+          <table className="table bg-backgroundBlack w-full min-w-[800px]">
+            <thead>
+              <tr className="text-xs">
+                <th className="w-12"></th>
+                <th className="w-12">#</th>
+                <th>Coin</th>
+                <th className="hidden lg:table-cell w-24"></th>
+                <th>Price</th>
+                <th>24h</th>
+                <th className="hidden md:table-cell">24h Volume</th>
+                <th className="hidden lg:table-cell">Market Cap</th>
+              </tr>
+            </thead>
+            <tbody className="text-xs">
+              {watchlistCoin.map((coin, i) => (
+                <tr key={coin.id} className="hover:bg-gray-900 transition-all cursor-pointer group">
+                  {/* Star Button */}
+                  <td>
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleRemoveFromWatchlist(coin.id);
+                      }}
+                      className="hover:scale-110 transition-transform"
+                      title="Remove from watchlist"
+                    >
+                      <FaStar className="text-xl text-yellow-400 cursor-pointer" />
+                    </button>
+                  </td>
+
+                  <Link className="contents" to={`/detail/${coin.id}`}>
+                    {/* Index */}
+                    <td>{i + 1}</td>
+
+                    {/* Coin Info */}
+                    <td>
+                      <div className="flex items-center gap-2 h-fit">
+                        <img
+                          src={coin.image}
+                          className="w-6 h-6 rounded-full bg-gray-800"
+                          alt={coin.name || coin.id}
+                          onError={(e) => {
+                            // Fallback jika image gagal load
+                            e.target.onerror = null;
+                            e.target.src = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><rect width='24' height='24' fill='%23374151'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='white' font-size='12' font-weight='bold'>${
+                              coin.symbol?.charAt(0).toUpperCase() || "?"
+                            }</text></svg>`;
+                          }}
+                        />
+                        <p className="capitalize hidden sm:inline">{coin.name || coin.id}</p>
+                        <p className="text-xs text-white opacity-70 uppercase">{coin.symbol}</p>
+                      </div>
+                    </td>
+
+                    {/* Buy Button */}
+                    <td className="hidden lg:table-cell">
+                      <h1 className="text-primary border border-primary rounded-full py-1 px-2 text-center whitespace-nowrap">Buy</h1>
+                    </td>
+
+                    {/* Price - ✅ FIXED */}
+                    <td className="whitespace-nowrap">${coin.current_price?.toLocaleString("en-US") || "N/A"}</td>
+
+                    {/* 24h Change - ✅ FIXED */}
+                    <td className={coin.price_change_percentage_24h > 0 ? "text-green-500" : "text-red-500"}>
+                      {coin.price_change_percentage_24h ? coin.price_change_percentage_24h.toFixed(2) + "%" : "N/A"}
+                    </td>
+
+                    {/* 24h Volume - ✅ FIXED */}
+                    <td className="hidden md:table-cell whitespace-nowrap">${coin.total_volume?.toLocaleString("en-US") || "N/A"}</td>
+
+                    {/* Market Cap - ✅ FIXED */}
+                    <td className="hidden lg:table-cell whitespace-nowrap">${coin.market_cap?.toLocaleString("en-US") || "N/A"}</td>
+                  </Link>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Footer Info */}
+        <div className="mt-6 text-center text-gray-400 text-sm">
+          <p>Click the star icon to remove coins from your watchlist</p>
+        </div>
+      </div>
+    </ProtectedRoute>
   );
 };
 
