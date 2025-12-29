@@ -70,9 +70,6 @@ const Navbar = () => {
             <Link className="text-sm hover:text-primary hover:pb-1 hover:border-b-2 border-primary transition-all" to={"/"}>
               Homepage
             </Link>
-            <Link className="text-sm hover:text-primary hover:pb-1 hover:border-b-2 border-primary transition-all" to={"/community"}>
-              Community
-            </Link>
           </div>
         </div>
 
@@ -82,13 +79,13 @@ const Navbar = () => {
             <input disabled={inputActive} type="text" placeholder="Search" className="bg-background px-4 py-2 rounded-xl placeholder:text-sm outline-none" />
           </button>
 
-          <Link to={"/Portofolio"} className="flex items-center gap-2">
+          <Link to={"/Portofolio"} className="flex items-center gap-2 hover:text-primary hover:pb-1 hover:border-b-2 border-primary transition-all ">
             <FaChartPie />
-            <h1 className="hover:text-primary hover:pb-1 hover:border-b-2 border-primary transition-all">Portofolio</h1>
+            <h1 className="">Portofolio</h1>
           </Link>
-          <Link className="flex items-center gap-2" to={"/watchlist"}>
+          <Link className="flex items-center gap-2  hover:text-primary hover:pb-1 hover:border-b-2 border-primary transition-all " to={"/watchlist"}>
             <FaStar />
-            <h1 className="hover:text-primary hover:pb-1 hover:border-b-2 border-primary transition-all">Watchlist</h1>
+            <h1 className="">Watchlist</h1>
           </Link>
 
           {user ? (
